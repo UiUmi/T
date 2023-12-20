@@ -1,147 +1,76 @@
-import pygame
+import os
+import time
 import sys
+import pygame
+from pygame.locals import *
+from sys import exit
+#游戏界面
 
 
 
+screen_width=1000
+screen_height=500
+back_color=pygame.Color(0,0,0)
+pygame.display.init()
+window=pygame.display.set_mode([screen_width,screen_height])
+pygame.display.set_caption("The Code Odyssey") #设置游戏窗口名称
+icon=pygame.image.load("icon\head.png")  #设置游戏窗口图标
+pygame.display.set_icon(icon)
+pygame.mixer.init() #加载和播放声音
+my_sound=pygame.mixer.Sound('music\music.mp3')
+my_sound.play(-1) #无限循环播放
+my_sound.set_volume(0.2)
+while True:
+    window.fill(back_color)
+    pygame.display.flip()
+    evenList=pygame.event.get()
+    for event in evenList:
+        if event.type==pygame.QUIT:
+            exit()
 
-class Game:
 
+# 人物
+person1=pygame.image.load("icon\person1.png")
+person1=pygame.transform.scale(person1, (20, 40))
+person1= pygame.transform.flip(person1, True, False)#在水平方向上翻转，数竖直方向不翻转
+person1_sword=pygame.image.load("icon\Sword.png")
+person1_sword=pygame.transform.scale(person1_sword, (100, 50))
+person1_sword = pygame.transform.flip(person1_sword, True, False)
+person1_face=1 #初始化人物是朝右边走的
+class CharacterPosition:
     def __init__(self):
-        # 初始化 Pygame
-        pygame.init()
+        self.lupx = 30
+        self.lupy = 30
 
-        # 游戏设置
-        self.WIDTH, self.HEIGHT = 1200, 700
-        self.SCREEN = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        pygame.display.set_caption("aad")
+    #描述人物占据空间 （20,40）的矩形
+    def renew(self):
+        self.rupx = self.lupx + 20    # 右上角 x 坐标
+        self.rupy = self.lupy         # 右上角 y 坐标
+        self.ldownx = self.lupx         # 左下角 x 坐标
+        self.ldowny = self.lupy + 40    # 左下角 y 坐标
+        self.rdownx = self.rupx         # 右下角 x 坐标
+        self.rdowny = self.ldowny         # 右下角 y 坐标
 
-        # 加载游戏背景图像
-        self.background_image = pygame.image.load("bgp1.png")
-        self.background_image = pygame.transform.scale(self.background_image, (self.WIDTH, self.HEIGHT))
+# 创建 CharacterPosition 类的实例对象
+person1_pos = CharacterPosition()
 
-        # 加载主角奔跑动画帧
-        self.run_frames = [
-            pygame.image.load("run1.png"),
-            pygame.image.load("run2.png"),
-            pygame.image.load("run3.png")
-        ]
-        self.current_frame = 0
-        self.player_image = self.run_frames[self.current_frame]
-        self.player_image = pygame.transform.scale(self.player_image, (60, 60))
+# 调用 renew 方法更新人物位置信息
+person1_pos.renew()
 
-        # 加载血量图像
-        self.heart_image = pygame.image.load("heart.png")
-        self.heart_image = pygame.transform.scale(self.heart_image, (30, 30))
-
-        # 环境重力
-        self.gravity = 0.4
-
-
-        # 初始化玩家速度和跳跃高度
-        self.player_speed = 4
-        self.jump_height = 50
-
-        # 玩家血量
-        self.player_health = 5
-
-        # 定义主角的位置和朝向
-        self.player_x = 50
-        self.player_y = self.HEIGHT - 240
-        self.is_facing_right = True
-
-        # 跳跃状态
-        self.is_jumping = False
-        self.jump_velocity = 0
-
-        # 奔跑状态
-        self.is_running = False
+# sword
+class SwordPosition:
+    def __init__(self):
+        self.lupx=person1_pos.rupx-10
+        self.face=1
+        self.lupy=person1.pos.rupy
+    def renew(self):
+        self.face=person1_face
+        if (self.face==1):
+            self.lupx=person1.rupx-30
+            self.lupx=person1_pos.rupy
+            self.rupx=self.lupx+120
+            self.rupy=self.lupy
+            self.ldownx=self.lupx
+            self.ldpwny=self.lupy+60
 
 
-
-        # 主角的地面高度
-        self.player_ground = self.HEIGHT - 180
-
-        # 血量指示器位置和间距
-        self.heart_x = 20
-        self.heart_y = 20
-        self.heart_spacing = 40
-
-        # 游戏循环
-        self.running = True
-
-    def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-
-    def update_player(self):
-        # 角色移动
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:
-            self.player_x -= self.player_speed
-            self.is_running = True
-            self.is_facing_right = False  # 左移时朝向左
-        elif keys[pygame.K_d]:
-            self.player_x += self.player_speed
-            self.is_running = True
-            self.is_facing_right = True  # 右移时朝向右
-        else:
-            self.is_running = False
-
-        # 切换奔跑动画帧
-        if self.is_running:
-            self.current_frame = (self.current_frame + 1) % len(self.run_frames)
-            self.player_image = self.run_frames[self.current_frame]
-            self.player_image = pygame.transform.scale(self.player_image, (60, 60))
-
-        # 跳跃
-        if not self.is_jumping:
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_w] and self.player_y == self.player_ground:
-                self.is_jumping = True
-                self.jump_velocity = 6
-
-        if self.player_y<self.player_ground or self.is_jumping:
-            self.player_y -= self.jump_velocity
-            self.jump_velocity -= self.gravity
-        else:
-            self.is_jumping = False
-            self.jump_velocity = 0
-
-
-
-
-
-
-
-    def render(self):
-        # 渲染背景
-        self.SCREEN.blit(self.background_image, (0, 0))
-
-        # 根据朝向渲染角色
-        if self.is_facing_right:
-            self.SCREEN.blit(self.player_image, (self.player_x, self.player_y))
-        else:
-            flipped_player_image = pygame.transform.flip(self.player_image, True, False)
-            self.SCREEN.blit(flipped_player_image, (self.player_x, self.player_y))
-
-        # 渲染血量指示器
-        for i in range(self.player_health):
-            self.SCREEN.blit(self.heart_image, (self.heart_x + i * self.heart_spacing, self.heart_y))
-
-        pygame.display.update()
-
-    def run_game(self):
-        # 游戏循环
-        while self.running:
-            self.handle_events()
-            self.update_player()
-            self.render()
-
-        # 游戏结束
-        pygame.quit()
-        sys.exit()
-
-# 创建游戏对象并运行游戏
-game = Game()
-game.run_game()
