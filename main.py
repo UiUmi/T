@@ -31,7 +31,7 @@ run_frames = [
 ]
 current_frame = 0
 player_image = run_frames[current_frame]
-player_image = pygame.transform.scale(player_image, (60, 60))
+player_image = pygame.transform.scale(player_image, (30, 30))
 
 
 # 加载红色爱心图像
@@ -66,7 +66,14 @@ player_ground = HEIGHT - 180
 heart_x = 20
 heart_y = 20
 heart_spacing = 40
+coin_x = 20
+coin_y = 60
+coin_spacing = 40
 
+#主角金币数和金币图像加载
+coins=0
+coins_icon = pygame.image.load("coin.png")
+coins_icon = pygame.transform.scale(coins_icon, (30, 30))
 
 # 加载菜单背景图像
 menu_background = pygame.image.load("menu.png")
@@ -203,6 +210,9 @@ while running:
             for i in range(player_health):
                 SCREEN.blit(heart_image, (heart_x + i * heart_spacing, heart_y))
 
+             # 渲染血量指示器
+            for i in range(coins):
+                SCREEN.blit(coins_icon, (coin_x + i * coin_spacing, coin_y))
             #检测商店页面打开
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
