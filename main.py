@@ -8,7 +8,9 @@ pygame.init()
 # 游戏设置
 WIDTH, HEIGHT = 1200, 700
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("The Code Odyssey") #设置游戏窗口名称
+pygame.display.set_caption("The Code Odyssey")
+
+#设置游戏窗口名称
 icon=pygame.image.load("icon\head.png")  #设置游戏窗口图标
 pygame.display.set_icon(icon)
 pygame.mixer.init() #加载和播放声音
