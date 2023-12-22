@@ -73,14 +73,22 @@ exit_button = pygame.transform.scale(exit_button, (200, 200))
 start_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 - 40)
 exit_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 + 60)
 
+
+
 # 标志，用于指示游戏是在菜单还是进行中
 in_menu = True
 
 #加载商店图标
 store_icon = pygame.image.load("store_icon.png")
-store_icon = pygame.transform.scale(store_icon, (60, 60))
-store_icon_pos = (WIDTH - 50, 20)
+store_icon = pygame.transform.scale(store_icon, (100, 100))
+store_icon_pos = (WIDTH - 100, 0)
 
+store_background = pygame.image.load("store.png")
+store_background = pygame.transform.scale(store_background, (300, 500))
+
+store_close_button = pygame.image.load("store_close_button.png")
+store_close_button = pygame.transform.scale(store_close_button, (84, 63))
+store_close_button_pos=(480,530)
 # 标志，用于指示商店
 in_store=False
 
@@ -92,7 +100,7 @@ while running:
             running = False
 
             # 检测菜单中的鼠标点击
-        if event.type == pygame.MOUSEBUTTONDOWN and in_menu:
+        if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
 
             # 检查鼠标点击是否在开始按钮上
@@ -105,7 +113,7 @@ while running:
                     and exit_button_pos[1] < mouse_pos[1] < exit_button_pos[1] + 200:
                 running = False
     if in_menu:
-
+        #渲染菜单背景
         SCREEN.blit(menu_background, (0, 0))
 
         # 渲染开始和退出按钮
@@ -116,7 +124,19 @@ while running:
     if not in_menu:
 
         if in_store:
-            1
+            #渲染商店页面
+            SCREEN.blit(store_background, (450, 100))
+            SCREEN.blit(store_close_button,(480,530))
+
+            # 检测商店中的鼠标点击
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+
+                # 检查鼠标点击是否在退出按钮上
+                if store_close_button_pos[0] < mouse_pos[0] < store_close_button_pos[0] + 84 \
+                        and store_close_button_pos[1] < mouse_pos[1] < store_close_button_pos[1] + 63:
+                    in_store = False
+                    running=True
 
 
         if not in_store:
