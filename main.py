@@ -8,7 +8,14 @@ pygame.init()
 # 游戏设置
 WIDTH, HEIGHT = 1200, 700
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("aad")
+pygame.display.set_caption("The Code Odyssey") #设置游戏窗口名称
+icon=pygame.image.load("icon\head.png")  #设置游戏窗口图标
+pygame.display.set_icon(icon)
+pygame.mixer.init() #加载和播放声音
+my_sound=pygame.mixer.Sound('music\music.mp3')
+my_sound.play(-1) #无限循环播放
+my_sound.set_volume(0.2)
+
 
 # 加载游戏背景图像
 background_image = pygame.image.load("bgp1.png")
@@ -30,7 +37,7 @@ heart_image = pygame.image.load("heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
 
 # 设置速度和跳跃高度为 1
-player_speed = 1.2
+player_speed = 0.6
 jump_speed = 2.5
 gravity=0.03
 
