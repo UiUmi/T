@@ -30,7 +30,7 @@ heart_image = pygame.transform.scale(heart_image, (30, 30))
 
 # 设置速度和跳跃高度为 1
 player_speed = 1.2
-jump_speed = 2
+jump_speed = 2.5
 gravity=0.03
 
 # 定义主角的位置和朝向
@@ -75,6 +75,14 @@ exit_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 + 60)
 # 标志，用于指示游戏是在菜单还是进行中
 in_menu = True
 
+#加载商店图标
+store_icon = pygame.image.load("store_icon.png")
+store_icon = pygame.transform.scale(store_icon, (60, 60))
+store_icon_pos = (WIDTH - 50, 20)
+
+# 标志，用于指示商店
+in_store=False
+
 # 游戏循环
 running = True
 while running:
@@ -105,62 +113,76 @@ while running:
 
     pygame.display.update()
     if not in_menu:
-        # 角色移动
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:
-            player_x -= player_speed
-            is_running = True
-            is_facing_right = False  # 左移时朝向左
-        elif keys[pygame.K_d]:
-            player_x += player_speed
-            is_running = True
-            is_facing_right = True  # 右移时朝向右
-        else:
-            is_running = False
 
-        # 切换奔跑动画帧
-        if is_running:
-            current_frame = (current_frame + 1) % len(run_frames)
-            player_image = run_frames[current_frame]
-            player_image = pygame.transform.scale(player_image, (60, 60))
+        if in_store:
+            1
 
-        # 跳跃
-        if not is_jumping:
+
+        if not in_store:
+            # 角色移动
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_w] and player_y == player_ground:
-                is_jumping = True
-                jump_velocity = jump_speed
-        else:
-            if player_y < player_ground or jump_velocity == jump_speed:
+            if keys[pygame.K_a]:
+                player_x -= player_speed
+                is_running = True
+                is_facing_right = False  # 左移时朝向左
+            elif keys[pygame.K_d]:
+                player_x += player_speed
+                is_running = True
+                is_facing_right = True  # 右移时朝向右
+            else:
+                is_running = False
+
+            # 切换奔跑动画帧
+            if is_running:
+                current_frame = (current_frame + 1) % len(run_frames)
+                player_image = run_frames[current_frame]
+                player_image = pygame.transform.scale(player_image, (60, 60))
+
+            # 跳跃
+            if not is_jumping:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_w] and player_y == player_ground:
+                    is_jumping = True
+                    jump_velocity = jump_speed
+            else:
+                if player_y < player_ground or jump_velocity == jump_speed:
+                    player_y -= jump_velocity
+                    jump_velocity -= gravity
+                else:
+                    is_jumping = False
+                    jump_velocity = 0
+
+            # 应用下降重力效果
+            if player_y < player_ground and not is_jumping:
                 player_y -= jump_velocity
                 jump_velocity -= gravity
+
+            # 限制主角在窗口范围内
+            player_x = max(0, min(player_x, WIDTH - 30))
+            player_y = max(0, min(player_y, player_ground))
+
+            # 渲染背景
+            SCREEN.blit(background_image, (0, 0))
+            # 根据朝向渲染角色
+            if is_facing_right:
+                SCREEN.blit(player_image, (player_x, player_y))
             else:
-                is_jumping = False
-                jump_velocity = 0
+                flipped_player_image = pygame.transform.flip(player_image, True, False)
+                SCREEN.blit(flipped_player_image, (player_x, player_y))
+            # 渲染血量指示器
+            for i in range(player_health):
+                SCREEN.blit(heart_image, (heart_x + i * heart_spacing, heart_y))
 
-        # 应用下降重力效果
-        if player_y < player_ground and not is_jumping:
-            player_y -= jump_velocity
-            jump_velocity -= gravity
+            #检测商店页面打开
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if store_icon_pos[0] < mouse_pos[0] < store_icon_pos[0] + 60 \
+                        and store_icon_pos[1] < mouse_pos[1] < store_icon_pos[1] + 60:
+                    in_store = not in_store
+            SCREEN.blit(store_icon, store_icon_pos)
+            pygame.display.update()
 
 
-        # 限制主角在窗口范围内
-        player_x = max(0, min(player_x, WIDTH - 30))
-        player_y = max(0, min(player_y, player_ground))
-
-        # 渲染背景
-        SCREEN.blit(background_image, (0, 0))
-        # 根据朝向渲染角色
-        if is_facing_right:
-            SCREEN.blit(player_image, (player_x, player_y))
-        else:
-            flipped_player_image = pygame.transform.flip(player_image, True, False)
-            SCREEN.blit(flipped_player_image, (player_x, player_y))
-        # 渲染血量指示器
-        for i in range(player_health):
-            SCREEN.blit(heart_image, (heart_x + i * heart_spacing, heart_y))
-
-        pygame.display.update()
 
 # 游戏结束
 pygame.quit()
