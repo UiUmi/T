@@ -29,10 +29,9 @@ heart_image = pygame.image.load("heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
 
 # 设置速度和跳跃高度为 1
-player_speed = 0.5
-jump_height = 50
-gravity_up = 0.03
-gravity_down = 0.6
+player_speed = 1.2
+jump_speed = 2
+gravity=0.03
 
 # 定义主角的位置和朝向
 player_x = 50
@@ -65,9 +64,9 @@ menu_background = pygame.transform.scale(menu_background, (WIDTH, HEIGHT))
 
 # 加载开始和退出按钮
 start_button = pygame.image.load("start.png")
-start_button = pygame.transform.scale(start_button, (200, 80))
+start_button = pygame.transform.scale(start_button, (200, 150))
 exit_button = pygame.image.load("exit.png")
-exit_button = pygame.transform.scale(exit_button, (200, 80))
+exit_button = pygame.transform.scale(exit_button, (200, 200))
 
 # 设置按钮位置
 start_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 - 40)
@@ -89,12 +88,12 @@ while running:
 
             # 检查鼠标点击是否在开始按钮上
             if start_button_pos[0] < mouse_pos[0] < start_button_pos[0] + 200 \
-                    and start_button_pos[1] < mouse_pos[1] < start_button_pos[1] + 80:
+                    and start_button_pos[1] < mouse_pos[1] < start_button_pos[1] + 150:
                 in_menu = False
 
             # 检查鼠标点击是否在退出按钮上
             elif exit_button_pos[0] < mouse_pos[0] < exit_button_pos[0] + 200 \
-                    and exit_button_pos[1] < mouse_pos[1] < exit_button_pos[1] + 80:
+                    and exit_button_pos[1] < mouse_pos[1] < exit_button_pos[1] + 200:
                 running = False
     if in_menu:
 
@@ -130,18 +129,20 @@ while running:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_w] and player_y == player_ground:
                 is_jumping = True
-                jump_velocity = 1.5
+                jump_velocity = jump_speed
         else:
-            if player_y < player_ground or jump_velocity == 1.5:
+            if player_y < player_ground or jump_velocity == jump_speed:
                 player_y -= jump_velocity
-                jump_velocity -= gravity_up
+                jump_velocity -= gravity
             else:
                 is_jumping = False
                 jump_velocity = 0
 
         # 应用下降重力效果
         if player_y < player_ground and not is_jumping:
-            player_y += gravity_down
+            player_y -= jump_velocity
+            jump_velocity -= gravity
+
 
         # 限制主角在窗口范围内
         player_x = max(0, min(player_x, WIDTH - 30))
