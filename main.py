@@ -58,6 +58,39 @@ heart_x = 20
 heart_y = 20
 heart_spacing = 40
 
+# 菜单设置
+menu_font = pygame.font.Font(None, 36)
+menu_color = (255, 255, 255)
+menu_options = ["Start", "Exit"]
+current_option = 0
+
+# 菜单循环
+in_menu = True
+while in_menu:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            in_menu = False
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w:
+                current_option = (current_option - 1) % len(menu_options)
+            elif event.key == pygame.K_s:
+                current_option = (current_option + 1) % len(menu_options)
+            elif event.key == pygame.K_RETURN:
+                if current_option == 0:  # 开始游戏
+                    in_menu = False
+                elif current_option == 1:  # 退出游戏
+                    in_menu = False
+                    running = False
+
+    # 渲染菜单
+    SCREEN.blit(background_image, (0, 0))
+    for i, option in enumerate(menu_options):
+        text = menu_font.render(option, True, menu_color)
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 50))
+        SCREEN.blit(text, text_rect)
+
+    pygame.display.update()
 # 游戏循环
 running = True
 while running:
