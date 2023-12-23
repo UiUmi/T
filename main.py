@@ -216,7 +216,7 @@ product3 = Product("Jump Potion", 10, "jump_potion.png")
 
 # 创建商品列表
 products = [product1, product2, product3]
-
+num_of_products=3
 
 # 商品显示字体
 product_font = pygame.font.SysFont(None, 30)
@@ -378,10 +378,15 @@ while running:
                     running = True
                 else:
                     # 检查商品是否被点击
-                    for i, product_rect in enumerate(product_rects):
-                        if product_rect.collidepoint(mouse_pos):
-                            selected_product = products[i]
-                            buy_product(selected_product)
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_pos = pygame.mouse.get_pos()
+                    for i in range(num_of_products):
+                        if 480 < mouse_pos[0] < 480+70 and 220 + 95*i < mouse_pos[1] < 220 + 70 + 95*i:
+                            buy_product(products[i])
+                            pygame.time.delay(500)
+
+
+
 
                             # 在这里可以执行购买商品的逻辑
 
