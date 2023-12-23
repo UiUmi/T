@@ -13,8 +13,10 @@ pygame.display.set_caption("The Code Odyssey")
 icon = pygame.image.load("icon\head.png")  # 设置游戏窗口图标
 pygame.display.set_icon(icon)
 pygame.mixer.init()  # 加载和播放声音
+
+pygame.mixer.music.load('music\music.mp3')  # 加载音乐文件，确保文件路径正确
 my_sound = pygame.mixer.Sound('music\music.mp3')
-my_sound.play(-1)  # 无限循环播放
+#my_sound.play(-1)  # 无限循环播放
 my_sound.set_volume(0.2)
 
 # 加载游戏背景图像
@@ -144,6 +146,8 @@ story_text = [
 current_story_index = 0
 story_box_open = False
 story_box_pos = (300, 150)
+music_box_open = False
+music_box_pos = (300,150)
 
 
 # 故事框按钮
@@ -151,6 +155,12 @@ story_box_button = pygame.image.load("story_box_button.png")
 story_box_button = pygame.transform.scale(story_box_button, (50, 50))
 story_box_button_pos = (WIDTH - 80, store_icon_pos[1] + store_icon.get_height() + 10)  # 放置在商店图标下方
 
+# 音乐框
+music_box_button=pygame.image.load("music_box_button.png")
+music_box_button = pygame.transform.scale(music_box_button, (50, 50))
+music_box_button_pos = (WIDTH - 80, story_box_button_pos[1] + store_icon.get_height() -10)  # 放置在故事按钮框图标下方
+# 游戏循环
+running = True
 # 游戏循环
 running = True
 while running:
@@ -182,6 +192,27 @@ while running:
                 story_box_open = not story_box_open
                 if story_box_open:
                     subtitle_timer = pygame.time.get_ticks()  # 重新设置计时器
+            elif music_box_button_pos[0] < mouse_pos[0] < music_box_button_pos[0] + 50 \
+                    and music_box_button_pos[1] < mouse_pos[1] < music_box_button_pos[1] + 50:
+                music_box_open = not music_box_open
+                if music_box_open:
+                    subtitle_timer = pygame.time.get_ticks()
+                    if pygame.mixer.music.get_busy():
+                        pygame.mixer.music.unpause()
+                    else:
+                        pygame.mixer.music.play(-1)  # -1 表示无限循环播放
+                else:
+                    pygame.mixer.music.pause()
+
+    if in_menu:
+        # 渲染菜单背景
+        SCREEN.blit(menu_background, (0, 0))
+
+        # 渲染开始和退出按钮
+        SCREEN.blit(start_button, start_button_pos)
+        SCREEN.blit(exit_button, exit_button_pos)
+
+    pygame.display.update()
 
     if in_menu:
         # 渲染菜单背景
@@ -275,6 +306,8 @@ while running:
 
             # 渲染故事框按钮
             SCREEN.blit(story_box_button, story_box_button_pos)
+            # 渲染音乐框按钮
+            SCREEN.blit(music_box_button, music_box_button_pos)
 
             # 如果故事框打开，渲染故事文本
             if story_box_open:
@@ -291,8 +324,23 @@ while running:
                     # 当字幕全部显示完毕后，重新开始循环
                     subtitle_timer = pygame.time.get_ticks()
 
+
+
             pygame.display.update()
 
 # 游戏结束
 pygame.quit()
 sys.exit()
+
+for event in pygame.event.get():
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        mouse_pos = pygame.mouse.get_pos()
+
+        # 检查鼠标点击是否在音乐框按钮上
+        if music_box_button_pos[0] < mouse_pos[0] < music_box_button_pos[0] + 50 \
+                and music_box_button_pos[1] < mouse_pos[1] < music_box_button_pos[1] + 50:
+            # 在这里切换音效的播放状态或者调整音量
+            if my_sound.get_volume() > 0:
+                my_sound.set_volume(0)
+            else:
+                my_sound.set_volume(0.2)
