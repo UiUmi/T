@@ -54,6 +54,9 @@ jump_velocity = 0
 # 奔跑状态
 is_running = False
 
+#是否有Monster
+is_monster_exit=False
+
 # 玩家血量
 player_health = 5
 
@@ -402,7 +405,6 @@ while running:
                     current_index = elapsed_time // subtitle_delay
                     rendered_text = story_text[:current_index + 1]
                     for i, line in enumerate(rendered_text):
-
                         text_surface = subtitle_font.render(line, True, (0, 0, 0))
                         text_rect = text_surface.get_rect(center=(story_box_pos[0] + 550, story_box_pos[1] + 250 + i * 30))
                         SCREEN.blit(text_surface, text_rect)
