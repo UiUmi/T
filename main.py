@@ -332,15 +332,4 @@ while running:
 pygame.quit()
 sys.exit()
 
-for event in pygame.event.get():
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        mouse_pos = pygame.mouse.get_pos()
 
-        # 检查鼠标点击是否在音乐框按钮上
-        if music_box_button_pos[0] < mouse_pos[0] < music_box_button_pos[0] + 50 \
-                and music_box_button_pos[1] < mouse_pos[1] < music_box_button_pos[1] + 50:
-            # 在这里切换音效的播放状态或者调整音量
-            if my_sound.get_volume() > 0:
-                my_sound.set_volume(0)
-            else:
-                my_sound.set_volume(0.2)
