@@ -107,8 +107,45 @@ store_close_button = pygame.image.load("store_close_button.png")
 store_close_button = pygame.transform.scale(store_close_button, (84, 63))
 store_close_button_pos = (480, 530)
 in_store = False
-# 背包
-inventory = []
+class InventoryItem:
+    def __init__(self, name, quantity):
+        self.name = name
+        self.quantity = quantity
+
+class PlayerInventory:
+    def __init__(self):
+        self.items = []
+
+    def add_item(self, item_name, quantity=1):
+        # 检查物品是否已经存在于背包中
+        for item in self.items:
+            if item.name == item_name:
+                item.quantity += quantity
+                return
+
+        # 如果物品不存在，添加新的物品
+        new_item = InventoryItem(name=item_name, quantity=quantity)
+        self.items.append(new_item)
+
+    def remove_item(self, item_name, quantity=1):
+        # 从背包中移除指定数量的物品
+        for item in self.items:
+            if item.name == item_name:
+                item.quantity -= quantity
+                if item.quantity <= 0:
+                    self.items.remove(item)
+                return
+
+    def get_item_quantity(self, item_name):
+        # 获取背包中指定物品的数量
+        for item in self.items:
+            if item.name == item_name:
+                return item.quantity
+        return 0
+
+# 创建主角的背包
+player_inventory = PlayerInventory()
+
 
 # 金币数量
 coins = 100
@@ -129,13 +166,13 @@ coins_rect.center = (90, 75)
 def save_player_data():
     with open("player_data.txt", "w") as file:
         file.write(str(coins) + "\n")
-        for item in inventory:
+        for item in player_inventory:
             file.write(item.name + "\n")
 
 # 加载玩家数据
 def load_player_data():
     global coins
-    global inventory
+    global player_inventory
     try:
         with open("player_data.txt", "r") as file:
             lines = file.readlines()
@@ -144,16 +181,16 @@ def load_player_data():
     except FileNotFoundError:
         # 如果文件不存在，使用默认值
         coins = 100
-        inventory = []
+        player_inventory = []
 
 # 在购买商品时的逻辑
 def buy_product(product):
     global coins
     if coins >= product.price:
         coins -= product.price
-        inventory.append(product)
+        player_inventory.add_item(product)
         print(f"You bought {product.name} for {product.price} coins!")
-        save_player_data()
+
     else:
         print("Not enough coins!")
 
@@ -323,20 +360,6 @@ while running:
     pygame.display.update()
 
     if not in_menu:
-        if in_store:
-            # 渲染商店页面
-            SCREEN.blit(store_background, (450, 100))
-            SCREEN.blit(store_close_button, (480, 530))
-
-            # 在商店页面处理鼠标点击事件
-            if in_store:
-                for i, product_rect in enumerate(product_rects):
-                    if product_rect.collidepoint(mouse_pos):
-                        selected_product = products[i]
-                        if coins >= selected_product.price:
-                            # 处理购买逻辑，例如减少金币并应用商品效果
-                            coins -= selected_product.price
-                            # 处理购买逻辑...
 
         if in_store:
             # 渲染商店页面
@@ -362,6 +385,7 @@ while running:
                     for i, product_rect in enumerate(product_rects):
                         if product_rect.collidepoint(mouse_pos):
                             selected_product = products[i]
+                            buy_product(selected_product)
 
                             # 在这里可以执行购买商品的逻辑
 
@@ -369,8 +393,8 @@ while running:
 
 
             # 在这里添加以下代码
-            # 清空商品矩形列表
-            product_rects = []
+
+
 
         if not in_store:
             # 角色移动
