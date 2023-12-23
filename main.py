@@ -211,12 +211,13 @@ class Product:
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (70, 70))
 product1 = Product("Health Potion", 10, "health_potion.png")
-product2 = Product("Speed Potion", 10, "speed_potion.png")
-product3 = Product("Jump Potion", 10, "jump_potion.png")
+product2 = Product("Speed Potion", 5, "speed_potion.png")
+product3 = Product("Jump Potion", 5, "jump_potion.png")
+product4= Product("character", 30, "player.png")
 
 # 创建商品列表
-products = [product1, product2, product3]
-num_of_products=3
+products = [product1, product2, product3,product4]
+num_of_products=4
 
 # 商品显示字体
 product_font = pygame.font.SysFont(None, 30)
@@ -354,9 +355,15 @@ while running:
             # 渲染商店页面
             SCREEN.blit(store_background, (450, 100))
             SCREEN.blit(store_close_button, (480, 530))
+
             # 渲染商品
             for i, product in enumerate(products):
-                product_rect = SCREEN.blit(product.image, (480, 220 + i * 95))
+                col = i % 2  # 每行最多显示2个商品
+
+                x = 480 + col * 118  # 根据列数计算 x 坐标
+                y = 220 + (i // 2) * 101  # 计算 y 坐标，每两个商品一行
+
+                product_rect = SCREEN.blit(product.image, (x, y))
                 product_rects.append(product_rect)
 
                 # 渲染商品价格
@@ -365,7 +372,7 @@ while running:
                 price_surface = price_font.render(price_text, True, (255, 255, 255))
                 price_rect = price_surface.get_rect(midleft=(product_rect.right + 10, product_rect.centery))
                 SCREEN.blit(price_surface, price_rect)
-            
+
             # 检测商店中的鼠标点击
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
