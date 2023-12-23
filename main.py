@@ -38,9 +38,9 @@ heart_image = pygame.image.load("heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
 
 # 设置速度和跳跃高度为 1
-player_speed = 0.6
-jump_speed = 2.5
-gravity = 0.03
+player_speed = 2.6
+jump_speed = 7
+gravity = 0.3
 
 # 定义主角的位置和朝向
 player_x = 50
@@ -81,11 +81,11 @@ menu_background = pygame.transform.scale(menu_background, (WIDTH, HEIGHT))
 start_button = pygame.image.load("start.png")
 start_button = pygame.transform.scale(start_button, (200, 150))
 exit_button = pygame.image.load("exit.png")
-exit_button = pygame.transform.scale(exit_button, (200, 200))
+exit_button = pygame.transform.scale(exit_button, (200, 150))
 
 # 设置按钮位置
-start_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 - 40)
-exit_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 + 60)
+start_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 - 20)
+exit_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 + 80)
 
 # 标志，用于指示游戏是在菜单还是进行中
 in_menu = True
@@ -105,7 +105,7 @@ in_store = False
 
 # 故事框相关设置
 story_box_background = pygame.image.load("story_box_background.png")
-story_box_background = pygame.transform.scale(story_box_background, (600, 400))
+story_box_background = pygame.transform.scale(story_box_background, (1100, 700))
 subtitle_font = pygame.font.SysFont(None, 30)
 subtitle_timer = pygame.time.get_ticks()
 subtitle_delay = 2000  # 2秒显示一个字幕
@@ -145,20 +145,20 @@ story_text = [
 
 current_story_index = 0
 story_box_open = False
-story_box_pos = (300, 150)
+story_box_pos = (WIDTH/2-550, -50)
 music_box_open = False
 music_box_pos = (300,150)
 
 
 # 故事框按钮
 story_box_button = pygame.image.load("story_box_button.png")
-story_box_button = pygame.transform.scale(story_box_button, (50, 50))
-story_box_button_pos = (WIDTH - 80, store_icon_pos[1] + store_icon.get_height() + 10)  # 放置在商店图标下方
+story_box_button = pygame.transform.scale(story_box_button, (100, 100))
+story_box_button_pos = (WIDTH - 100, store_icon_pos[1] + store_icon.get_height() -10)  # 放置在商店图标下方
 
 # 音乐框
 music_box_button=pygame.image.load("music_box_button.png")
 music_box_button = pygame.transform.scale(music_box_button, (50, 50))
-music_box_button_pos = (WIDTH - 80, story_box_button_pos[1] + store_icon.get_height() -10)  # 放置在故事按钮框图标下方
+music_box_button_pos = (WIDTH - 70, story_box_button_pos[1] + store_icon.get_height() -10)  # 放置在故事按钮框图标下方
 # 游戏循环
 running = True
 # 游戏循环
@@ -187,8 +187,8 @@ while running:
                 in_store = not in_store
 
             # 检查鼠标点击是否在故事框按钮上
-            elif story_box_button_pos[0] < mouse_pos[0] < story_box_button_pos[0] + 50 \
-                    and story_box_button_pos[1] < mouse_pos[1] < story_box_button_pos[1] + 50:
+            elif story_box_button_pos[0] < mouse_pos[0] < story_box_button_pos[0] + 100 \
+                    and story_box_button_pos[1] < mouse_pos[1] < story_box_button_pos[1] + 100:
                 story_box_open = not story_box_open
                 if story_box_open:
                     subtitle_timer = pygame.time.get_ticks()  # 重新设置计时器
@@ -317,8 +317,9 @@ while running:
                     current_index = elapsed_time // subtitle_delay
                     rendered_text = story_text[:current_index + 1]
                     for i, line in enumerate(rendered_text):
+
                         text_surface = subtitle_font.render(line, True, (0, 0, 0))
-                        text_rect = text_surface.get_rect(center=(story_box_pos[0] + 300, story_box_pos[1] + 50 + i * 30))
+                        text_rect = text_surface.get_rect(center=(story_box_pos[0] + 550, story_box_pos[1] + 250 + i * 30))
                         SCREEN.blit(text_surface, text_rect)
                 else:
                     # 当字幕全部显示完毕后，重新开始循环
