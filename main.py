@@ -72,7 +72,6 @@ coin_y = 60
 
 
 # 主角金币数和金币图像加载
-coins = 0
 coins_icon = pygame.image.load("coin.png")
 coins_icon = pygame.transform.scale(coins_icon, (30, 30))
 
@@ -80,7 +79,9 @@ coins_icon = pygame.transform.scale(coins_icon, (30, 30))
 menu_background = pygame.image.load("menu.png")
 menu_background = pygame.transform.scale(menu_background, (WIDTH, HEIGHT))
 
-# 加载开始和退出按钮
+# 加载开始和退出按钮以及title
+Title = pygame.image.load("Title.png")
+Title = pygame.transform.scale(Title, (600, 150))
 start_button = pygame.image.load("start.png")
 start_button = pygame.transform.scale(start_button, (200, 150))
 exit_button = pygame.image.load("exit.png")
@@ -89,6 +90,7 @@ exit_button = pygame.transform.scale(exit_button, (200, 150))
 # 设置按钮位置
 start_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 - 20)
 exit_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 + 80)
+Title_pos=(WIDTH//2-300,HEIGHT//2-250)
 
 # 标志，用于指示游戏是在菜单还是进行中
 in_menu = True
@@ -304,6 +306,7 @@ while running:
         SCREEN.blit(menu_background, (0, 0))
 
         # 渲染开始和退出按钮
+        SCREEN.blit(Title, Title_pos)
         SCREEN.blit(start_button, start_button_pos)
         SCREEN.blit(exit_button, exit_button_pos)
 
