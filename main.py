@@ -350,7 +350,6 @@ while running:
     pygame.display.update()
 
     if not in_menu:
-
         if in_store:
             # 渲染商店页面
             SCREEN.blit(store_background, (450, 100))
@@ -384,9 +383,6 @@ while running:
                         if 480 < mouse_pos[0] < 480+70 and 220 + 95*i < mouse_pos[1] < 220 + 70 + 95*i:
                             buy_product(products[i])
                             pygame.time.delay(500)
-
-
-
 
                             # 在这里可以执行购买商品的逻辑
 
@@ -455,7 +451,8 @@ while running:
                 SCREEN.blit(heart_image, (heart_x + i * heart_spacing, heart_y))
 
             # 渲染金币指示器
-
+            num_of_coins = f"x {coins}"
+            coins_surface = font.render(num_of_coins, True, (255, 255, 255))
             SCREEN.blit(coins_icon, (coin_x, coin_y))
             SCREEN.blit(coins_surface, coins_rect)
             # 渲染商店图标
