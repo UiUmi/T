@@ -188,7 +188,7 @@ def buy_product(product):
     global coins
     if coins >= product.price:
         coins -= product.price
-        player_inventory.add_item(product)
+        player_inventory.add_item(product.name)
         print(f"You bought {product.name} for {product.price} coins!")
 
     else:
@@ -210,11 +210,11 @@ class Product:
         self.price = price
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (70, 70))
-product1 = Product("Health Potion", 10, "health_potion.png")
-product2 = Product("Speed Potion", 5, "speed_potion.png")
-product3 = Product("Jump Potion", 5, "jump_potion.png")
+product1 = Product("health_potion", 10, "health_potion.png")
+product2 = Product("speed_potion", 5, "speed_potion.png")
+product3 = Product("jump_potion", 5, "jump_potion.png")
 product4= Product("ak_potion", 15, "ak_potion.png")
-product5= Product("character", 30, "player.png")
+product5= Product("character1", 30, "character1.png")
 
 # 创建商品列表
 products = [product1, product2, product3,product4,product5]
@@ -387,10 +387,14 @@ while running:
                     # 检查商品是否被点击
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         mouse_pos = pygame.mouse.get_pos()
+
                     for i in range(num_of_products):
-                        if 480 < mouse_pos[0] < 480+70 and 220 + 95*i < mouse_pos[1] < 220 + 70 + 95*i:
+                        l=i%2
+                        c=i//2
+                        if 480 +l*118< mouse_pos[0] < 480+70 +l*118 and 220 + 101*c < mouse_pos[1] < 220 + 70 + 101*c:
                             buy_product(products[i])
                             pygame.time.delay(500)
+
 
                             # 在这里可以执行购买商品的逻辑
 
@@ -495,6 +499,17 @@ while running:
             if inventory_box_open :
                 SCREEN.blit(inventory_box_background,inventory_box_pos)
 
+                item_spacing = 60
+                for i, item in enumerate(player_inventory.items):
+                    item_image = pygame.image.load(f"{item.name}.png")  # 假设物品图片文件名与物品名相匹配
+                    item_image = pygame.transform.scale(item_image, (50, 50))
+                    SCREEN.blit(item_image, (inventory_box_pos[0] + 50, inventory_box_pos[1] + 150 + i * item_spacing))
+
+                    # 显示物品数量
+                    quantity_text = f"x {item.quantity}"
+                    quantity_surface = font.render(quantity_text, True, (255, 255, 255))
+                    SCREEN.blit(quantity_surface,
+                                (inventory_box_pos[0] + 120, inventory_box_pos[1] + 170 + i * item_spacing))
 
             pygame.display.update()
 
