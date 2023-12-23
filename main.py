@@ -365,12 +365,18 @@ while running:
             # 渲染商店页面
             SCREEN.blit(store_background, (450, 100))
             SCREEN.blit(store_close_button, (480, 530))
-
             # 渲染商品
             for i, product in enumerate(products):
                 product_rect = SCREEN.blit(product.image, (480, 220 + i * 95))
                 product_rects.append(product_rect)
 
+                # 渲染商品价格
+                price_font = pygame.font.Font(None, 25)
+                price_text = f"${product.price}"
+                price_surface = price_font.render(price_text, True, (255, 255, 255))
+                price_rect = price_surface.get_rect(midleft=(product_rect.right + 10, product_rect.centery))
+                SCREEN.blit(price_surface, price_rect)
+            
             # 检测商店中的鼠标点击
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
