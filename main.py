@@ -171,9 +171,9 @@ class Product:
         self.price = price
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (100, 100))
-product1 = Product("Item 1", 10, "item1.png")
-product2 = Product("Item 2", 20, "item2.png")
-product3 = Product("Item 3", 30, "item3.png")
+product1 = Product("Health Potion", 10, "health_potion.png")
+product2 = Product("Speed Potion", 10, "speed_potion.png")
+product3 = Product("Jump Potion", 10, "jump_potion.png")
 
 # 创建商品列表
 products = [product1, product2, product3]
@@ -342,7 +342,7 @@ while running:
 
             # 渲染商品
             for i, product in enumerate(products):
-                product_rect = SCREEN.blit(product.image, (500, 150 + i * 120))
+                product_rect = SCREEN.blit(product.image, (480, 200 + i * 120))
                 product_rects.append(product_rect)
 
             # 检测商店中的鼠标点击
