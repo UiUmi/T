@@ -203,18 +203,38 @@ story_box_pos = (WIDTH/2-550, -50)
 music_box_open = False
 music_box_pos = (300,150)
 
+inventory_box_open=False
+inventory_box_pos = ((WIDTH - 1100) // 2, 50)
+# 背包内容
+inventory_box_background = pygame.image.load("story_box_background.png")
+inventory_box_background = pygame.transform.scale(story_box_background, (500, 500)) ###
 
+
+rule_box_open = False
+rule_box_pos = (WIDTH/2-550, -50)
+rule_box_background = pygame.image.load("rule_box_background.png")
+rule_box_background = pygame.transform.scale(rule_box_background, (1100, 700))
+
+#######各个图标的建立
 # 故事框按钮
 story_box_button = pygame.image.load("story_box_button.png")
-story_box_button = pygame.transform.scale(story_box_button, (60, 60))
-story_box_button_pos = (WIDTH - 80, store_icon_pos[1] + store_icon.get_height() +10)  # 放置在商店图标下方
+story_box_button = pygame.transform.scale(story_box_button, (100, 100))
+story_box_button_pos = (WIDTH - 98, store_icon_pos[1] + store_icon.get_height() -8)  # 放置在商店图标下方
 
 # 音乐框
 music_box_button=pygame.image.load("music_box_button.png")
-music_box_button = pygame.transform.scale(music_box_button, (50, 50))
-music_box_button_pos = (WIDTH - 70, story_box_button_pos[1] + store_icon.get_height() -10)  # 放置在故事按钮框图标下方
-# 游戏循环
-running = True
+music_box_button = pygame.transform.scale(music_box_button, (70, 70))
+music_box_button_pos = (WIDTH - 80, story_box_button_pos[1] + store_icon.get_height() -10)  # 放置在故事按钮框图标下方
+##背包图标
+inventory_box_button = pygame.image.load("inventory_button.png")
+inventory_box_button = pygame.transform.scale(inventory_box_button, (80, 80))
+inventory_box_button_pos = (0,90)
+# 规则图标
+rule_button = pygame.image.load("rule_button.png")
+rule_button = pygame.transform.scale(rule_button, (110,95))
+rule_button_pos= (WIDTH - 105, story_box_button_pos[1] + store_icon.get_height() +60)
+
+
 # 游戏循环
 running = True
 while running:
@@ -241,8 +261,8 @@ while running:
                 in_store = not in_store
 
             # 检查鼠标点击是否在故事框按钮上
-            elif story_box_button_pos[0] < mouse_pos[0] < story_box_button_pos[0] + 60 \
-                    and story_box_button_pos[1] < mouse_pos[1] < story_box_button_pos[1] + 60:
+            elif story_box_button_pos[0] < mouse_pos[0] < story_box_button_pos[0] + 100 \
+                    and story_box_button_pos[1] < mouse_pos[1] < story_box_button_pos[1] + 100:
                 story_box_open = not story_box_open
                 if story_box_open:
                     subtitle_timer = pygame.time.get_ticks()  # 重新设置计时器
@@ -257,6 +277,15 @@ while running:
                         pygame.mixer.music.play(-1)  # -1 表示无限循环播放
                 else:
                     pygame.mixer.music.pause()
+            elif inventory_box_button_pos[0]< mouse_pos[0] < inventory_box_button_pos[0]+100\
+                    and inventory_box_button_pos[1] <mouse_pos[1]< inventory_box_button_pos[1]+100:
+
+                inventory_box_open = not inventory_box_open
+            elif rule_button_pos[0] < mouse_pos[0] < rule_button_pos[0] + 110 and rule_button_pos[1] < mouse_pos \
+                [1] < rule_button_pos[1] + 95:
+
+                rule_box_open = not rule_box_open
+
 
     if in_menu:
         # 渲染菜单背景
@@ -318,7 +347,7 @@ while running:
                     for i, product_rect in enumerate(product_rects):
                         if product_rect.collidepoint(mouse_pos):
                             selected_product = products[i]
-                            print(f"Selected Product: {selected_product.name}")
+
                             # 在这里可以执行购买商品的逻辑
 
                 # 检查鼠标点击是否在退出按钮上
@@ -396,7 +425,10 @@ while running:
             SCREEN.blit(story_box_button, story_box_button_pos)
             # 渲染音乐框按钮
             SCREEN.blit(music_box_button, music_box_button_pos)
-
+            # 渲染背包框
+            SCREEN.blit(inventory_box_button, inventory_box_button_pos)
+            #渲染规则框
+            SCREEN.blit(rule_button, rule_button_pos)
             # 如果故事框打开，渲染故事文本
             if story_box_open:
                 SCREEN.blit(story_box_background, story_box_pos)
@@ -411,7 +443,12 @@ while running:
                 else:
                     # 当字幕全部显示完毕后，重新开始循环
                     subtitle_timer = pygame.time.get_ticks()
-
+            if rule_box_open:
+                # 渲染 story_box_background.png 和相关文本
+                SCREEN.blit(rule_box_background, rule_box_pos)
+                # 其他渲染逻辑...
+            if inventory_box_open :
+                SCREEN.blit(inventory_box_background,inventory_box_pos)
 
 
             pygame.display.update()
