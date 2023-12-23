@@ -152,8 +152,8 @@ music_box_pos = (300,150)
 
 # 故事框按钮
 story_box_button = pygame.image.load("story_box_button.png")
-story_box_button = pygame.transform.scale(story_box_button, (100, 100))
-story_box_button_pos = (WIDTH - 100, store_icon_pos[1] + store_icon.get_height() -10)  # 放置在商店图标下方
+story_box_button = pygame.transform.scale(story_box_button, (60, 60))
+story_box_button_pos = (WIDTH - 80, store_icon_pos[1] + store_icon.get_height() +10)  # 放置在商店图标下方
 
 # 音乐框
 music_box_button=pygame.image.load("music_box_button.png")
@@ -187,8 +187,8 @@ while running:
                 in_store = not in_store
 
             # 检查鼠标点击是否在故事框按钮上
-            elif story_box_button_pos[0] < mouse_pos[0] < story_box_button_pos[0] + 100 \
-                    and story_box_button_pos[1] < mouse_pos[1] < story_box_button_pos[1] + 100:
+            elif story_box_button_pos[0] < mouse_pos[0] < story_box_button_pos[0] + 60 \
+                    and story_box_button_pos[1] < mouse_pos[1] < story_box_button_pos[1] + 60:
                 story_box_open = not story_box_open
                 if story_box_open:
                     subtitle_timer = pygame.time.get_ticks()  # 重新设置计时器
