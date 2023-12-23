@@ -213,11 +213,12 @@ class Product:
 product1 = Product("Health Potion", 10, "health_potion.png")
 product2 = Product("Speed Potion", 5, "speed_potion.png")
 product3 = Product("Jump Potion", 5, "jump_potion.png")
-product4= Product("character", 30, "player.png")
+product4= Product("ak_potion", 15, "ak_potion.png")
+product5= Product("character", 30, "player.png")
 
 # 创建商品列表
-products = [product1, product2, product3,product4]
-num_of_products=4
+products = [product1, product2, product3,product4,product5]
+num_of_products=5
 
 # 商品显示字体
 product_font = pygame.font.SysFont(None, 30)
