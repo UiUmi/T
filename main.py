@@ -102,6 +102,75 @@ store_close_button = pygame.image.load("store_close_button.png")
 store_close_button = pygame.transform.scale(store_close_button, (84, 63))
 store_close_button_pos = (480, 530)
 in_store = False
+# 背包
+inventory = []
+
+# 金币数量
+coins = 100
+
+# 保存玩家数据
+def save_player_data():
+    with open("player_data.txt", "w") as file:
+        file.write(str(coins) + "\n")
+        for item in inventory:
+            file.write(item.name + "\n")
+
+# 加载玩家数据
+def load_player_data():
+    global coins
+    global inventory
+    try:
+        with open("player_data.txt", "r") as file:
+            lines = file.readlines()
+            coins = int(lines[0].strip())
+            inventory = [Product(name.strip(), 0) for name in lines[1:]]
+    except FileNotFoundError:
+        # 如果文件不存在，使用默认值
+        coins = 100
+        inventory = []
+
+# 在购买商品时的逻辑
+def buy_product(product):
+    global coins
+    if coins >= product.price:
+        coins -= product.price
+        inventory.append(product)
+        print(f"You bought {product.name} for {product.price} coins!")
+        save_player_data()
+    else:
+        print("Not enough coins!")
+
+# 在其他地方更新显示玩家的金币数量和背包
+def update_display():
+    # 更新金币数量的显示
+    # SCREEN.blit(coins_icon, (coin_x + i * coin_spacing, coin_y))
+    # pygame.display.update()
+
+    # 更新背包的显示
+    for i, item in enumerate(inventory):
+        print(f"Item {i + 1}: {item.name}")
+
+class Product:
+    def __init__(self, name, price, image_path):
+        self.name = name
+        self.price = price
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (100, 100))
+product1 = Product("Item 1", 10, "item1.png")
+product2 = Product("Item 2", 20, "item2.png")
+product3 = Product("Item 3", 30, "item3.png")
+
+# 创建商品列表
+products = [product1, product2, product3]
+
+
+
+
+# 商品显示字体
+product_font = pygame.font.SysFont(None, 30)
+
+# 商品矩形列表，用于处理鼠标点击
+product_rects = []
 
 # 故事框相关设置
 story_box_background = pygame.image.load("story_box_background.png")
@@ -114,30 +183,12 @@ story_text = [
     "You, a bright and ambitious computer science student, embarked on a journey",
     "to explore the vast landscape of programming and software development.",
     "",
-    "As you entered the university, you were greeted by the binary whispers of",
-    "the computers and the rhythmic hum of servers in the distance.",
-    "",
     "Your first challenge was to unravel the mysteries of programming languages.",
     "You dived into the realms of Python, Java, and C++, each line of code",
     "bringing you closer to the power of turning logic into reality.",
     "",
     "With each passing semester, you faced new quests - algorithms, data structures,",
     "and the enchanted world of artificial intelligence.",
-    "",
-    "Late nights were spent debugging, and the glow of your screen became a beacon",
-    "in the silent halls of the computer labs.",
-    "",
-    "You forged alliances with fellow coders, engaging in epic coding battles",
-    "and collaborative quests to conquer challenging assignments.",
-    "",
-    "As you delved deeper, you discovered the magical repositories of open source",
-    "and contributed to the collective knowledge of the programming realm.",
-    "",
-    "Now, as you stand on the brink of graduation, you reflect on the incredible",
-    "adventure that your programming journey has been.",
-    "",
-    "The code scrolls before your eyes, and you realize that this is just",
-    "the beginning of an endless quest for knowledge and innovation.",
     "",
     "And so, with your keyboard as your sword and your IDE as your shield,",
     "you step into the world, ready to write your own code odyssey."
@@ -230,6 +281,26 @@ while running:
             SCREEN.blit(store_background, (450, 100))
             SCREEN.blit(store_close_button, (480, 530))
 
+            # 在商店页面处理鼠标点击事件
+            if in_store:
+                for i, product_rect in enumerate(product_rects):
+                    if product_rect.collidepoint(mouse_pos):
+                        selected_product = products[i]
+                        if coins >= selected_product.price:
+                            # 处理购买逻辑，例如减少金币并应用商品效果
+                            coins -= selected_product.price
+                            # 处理购买逻辑...
+
+        if in_store:
+            # 渲染商店页面
+            SCREEN.blit(store_background, (450, 100))
+            SCREEN.blit(store_close_button, (480, 530))
+
+            # 渲染商品
+            for i, product in enumerate(products):
+                product_rect = SCREEN.blit(product.image, (500, 150 + i * 120))
+                product_rects.append(product_rect)
+
             # 检测商店中的鼠标点击
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
@@ -239,6 +310,20 @@ while running:
                         and store_close_button_pos[1] < mouse_pos[1] < store_close_button_pos[1] + 63:
                     in_store = False
                     running = True
+                else:
+                    # 检查商品是否被点击
+                    for i, product_rect in enumerate(product_rects):
+                        if product_rect.collidepoint(mouse_pos):
+                            selected_product = products[i]
+                            print(f"Selected Product: {selected_product.name}")
+                            # 在这里可以执行购买商品的逻辑
+
+                # 检查鼠标点击是否在退出按钮上
+
+
+            # 在这里添加以下代码
+            # 清空商品矩形列表
+            product_rects = []
 
         if not in_store:
             # 角色移动
