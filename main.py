@@ -69,7 +69,7 @@ heart_y = 20
 heart_spacing = 40
 coin_x = 20
 coin_y = 60
-coin_spacing = 40
+
 
 # 主角金币数和金币图像加载
 coins = 0
@@ -110,6 +110,18 @@ inventory = []
 
 # 金币数量
 coins = 100
+# 设置字体和变量
+font_size = 36
+font = pygame.font.Font(None, font_size)  # 使用默认字体
+num_of_coins = f"x {coins}"
+# 渲染文本到 Surface
+coins_surface = font.render(num_of_coins, True, (255, 255, 255))  # 文本颜色为黑色
+
+# 获取 Surface 的矩形对象
+coins_rect = coins_surface.get_rect()
+
+# 设置文本位置
+coins_rect.center = (90, 75)
 
 # 保存玩家数据
 def save_player_data():
@@ -415,9 +427,9 @@ while running:
                 SCREEN.blit(heart_image, (heart_x + i * heart_spacing, heart_y))
 
             # 渲染金币指示器
-            for i in range(coins):
-                SCREEN.blit(coins_icon, (coin_x + i * coin_spacing, coin_y))
 
+            SCREEN.blit(coins_icon, (coin_x, coin_y))
+            SCREEN.blit(coins_surface, coins_rect)
             # 渲染商店图标
             SCREEN.blit(store_icon, store_icon_pos)
 
