@@ -81,7 +81,7 @@ menu_background = pygame.transform.scale(menu_background, (WIDTH, HEIGHT))
 
 # 加载开始和退出按钮以及title
 Title = pygame.image.load("Title.png")
-Title = pygame.transform.scale(Title, (600, 150))
+Title = pygame.transform.scale(Title, (800, 130))
 start_button = pygame.image.load("start.png")
 start_button = pygame.transform.scale(start_button, (200, 150))
 exit_button = pygame.image.load("exit.png")
@@ -90,7 +90,7 @@ exit_button = pygame.transform.scale(exit_button, (200, 150))
 # 设置按钮位置
 start_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 - 20)
 exit_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 + 80)
-Title_pos=(WIDTH//2-300,HEIGHT//2-250)
+Title_pos=(WIDTH//2-400,HEIGHT//2-250)
 
 # 标志，用于指示游戏是在菜单还是进行中
 in_menu = True
@@ -218,8 +218,6 @@ product3 = Product("Jump Potion", 10, "jump_potion.png")
 products = [product1, product2, product3]
 
 
-
-
 # 商品显示字体
 product_font = pygame.font.SysFont(None, 30)
 
@@ -338,22 +336,14 @@ while running:
                 rule_box_open = not rule_box_open
 
 
+
+
     if in_menu:
         # 渲染菜单背景
         SCREEN.blit(menu_background, (0, 0))
 
         # 渲染开始和退出按钮
         SCREEN.blit(Title, Title_pos)
-        SCREEN.blit(start_button, start_button_pos)
-        SCREEN.blit(exit_button, exit_button_pos)
-
-    pygame.display.update()
-
-    if in_menu:
-        # 渲染菜单背景
-        SCREEN.blit(menu_background, (0, 0))
-
-        # 渲染开始和退出按钮
         SCREEN.blit(start_button, start_button_pos)
         SCREEN.blit(exit_button, exit_button_pos)
 
