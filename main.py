@@ -31,7 +31,7 @@ run_frames = [
 ]
 current_frame = 0
 player_image = run_frames[current_frame]
-player_image = pygame.transform.scale(player_image, (30, 30))
+player_image = pygame.transform.scale(player_image, (60, 60))
 
 # 加载红色爱心图像
 heart_image = pygame.image.load("heart.png")
@@ -222,7 +222,7 @@ def change_player_image(product):
         current_frame = 0
         global player_image
         player_image = run_frames[current_frame]
-        player_image = pygame.transform.scale(player_image, (30, 30))
+        player_image = pygame.transform.scale(player_image, (60, 60))
 
 
 
@@ -249,7 +249,7 @@ product2 = Product("speed_potion", 5, "speed_potion.png")
 product3 = Product("jump_potion", 5, "jump_potion.png")
 product4= Product("ak_potion", 15, "ak_potion.png")
 product5= Product("player1", 30, "player1.png")
-product6= Product("player", 0, "player.png")
+product6= Product("player2", 0, "player2.png")
 
 # 创建商品列表
 products = [product1, product2, product3,product4,product5,product6]
