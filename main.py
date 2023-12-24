@@ -52,6 +52,9 @@ player_attack_timer = 0.0
 player_attack_animation = pygame.image.load("player_attack_animation.png")  # 替换为你的攻击动画图片
 player_attack_animation = pygame.transform.scale(player_attack_animation, (60, 60))
 
+#人物撞击伤害
+player_damage=1
+
 # 定义主角的位置和朝向
 player_x = 50
 player_y = HEIGHT - 240
