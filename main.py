@@ -3,7 +3,8 @@ import sys
 
 # 初始化 Pygame
 pygame.init()
-
+FPS = 60
+clock = pygame.time.Clock()
 # 游戏设置
 WIDTH, HEIGHT = 1200, 700
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -38,7 +39,9 @@ heart_image = pygame.image.load("heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
 
 # 设置速度和跳跃高度为 1
-player_speed = 2.6
+normal_speed=2.6
+player_speed = normal_speed
+
 jump_speed = 7
 gravity = 0.3
 
@@ -239,7 +242,7 @@ def update_display():
     # pygame.display.update()
 
     # 更新背包的显示
-    for i, item in enumerate(inventory):
+    for i, item in enumerate(player_inventory):
         print(f"Item {i + 1}: {item.name}")
 
 class Product:
@@ -253,9 +256,9 @@ product2 = Product("speed_potion", 5, "speed_potion.png")
 product3 = Product("jump_potion", 5, "jump_potion.png")
 product4= Product("ak_potion", 15, "ak_potion.png")
 product5= Product("player1", 30, "player1.png")
-product6= Product("player2", 0, "player2.png")
+product6= Product("player2", 15, "player2.png")
 product7= Product("weapon1", 0, "weapon1.png")
-product8= Product("player2", 0, "player2.png")
+product8= Product("player", 0, "player.png")
 
 
 # 创建商品列表
@@ -328,9 +331,24 @@ rule_button = pygame.transform.scale(rule_button, (110,95))
 rule_button_pos= (WIDTH - 105, story_box_button_pos[1] + store_icon.get_height() +60)
 
 
+
+#################速度
+speed_boost_amount = 1.0  # 初始速度增加量
+normal_speed = 2.6  # 默认速度
+player_speed = normal_speed  # 初始玩家速度
+# 在游戏循环之前定义变量
+is_speed_boost_active = False
+speed_boost_end_time = 0
+speed_boost_message_duration = 2000  # 2秒，以毫秒为单位
+##################跳跃
+# 在你的初始化部分定义以下变量
+original_jump_speed=7
+is_jump_potion_active = False
+jump_potion_duration = 0.0
 # 游戏循环
 running = True
 while running:
+    dt = clock.tick(FPS) / 1000.0
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -446,28 +464,30 @@ while running:
                             pygame.time.delay(500)
 
 
-                            # 在这里可以执行购买商品的逻辑
 
-                # 检查鼠标点击是否在退出按钮上
-
-
-            # 在这里添加以下代码
 
 
 
         if not in_store:
             # 角色移动
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_a]:
-                player_x -= player_speed
-                is_running = True
-                is_facing_right = False  # 左移时朝向左
-            elif keys[pygame.K_d]:
-                player_x += player_speed
-                is_running = True
-                is_facing_right = True  # 右移时朝向右
-            else:
-                is_running = False
+            if not in_store:
+                # 角色移动
+                keys = pygame.key.get_pressed()
+
+                # 在加速状态下，使用增加后的速度
+                current_speed = player_speed * speed_boost_amount
+
+                if keys[pygame.K_a]:
+                    player_x -= current_speed
+                    is_running = True
+                    is_facing_right = False  # 左移时朝向左
+                elif keys[pygame.K_d]:
+                    player_x += current_speed
+                    is_running = True
+                    is_facing_right = True  # 右移时朝向右
+                else:
+                    is_running = False
 
             # 切换奔跑动画帧
             if is_running:
@@ -480,7 +500,11 @@ while running:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_w] and player_y == player_ground:
                     is_jumping = True
-                    jump_velocity = jump_speed
+                    # Check if the jump potion is active
+                    if is_jump_potion_active:
+                        jump_velocity = jump_speed  # Use the modified jump speed
+                    else:
+                        jump_velocity = original_jump_speed  # Use the original jump speed
             else:
                 if player_y < player_ground or jump_velocity == jump_speed:
                     player_y -= jump_velocity
@@ -566,10 +590,6 @@ while running:
                     quantity_text = f"x {item.quantity}"
                     quantity_surface = font.render(quantity_text, True, (255, 255, 255))
                     SCREEN.blit(quantity_surface, (x + 70, y + 20))
-                # 检查鼠标点击是否在背包中的物品上
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-
                     # 检查鼠标点击是否在背包中的物品上
                     for i, item in enumerate(player_inventory.items):
                         row = i // items_per_row
@@ -606,8 +626,73 @@ while running:
                                         else:
                                             print(f"Run frames not found for {product.name}")
                                         # 在这里可以执行购买商品的逻辑
+                                    if product.name == "health_potion":
+                                        # 增加爱心的数量
+                                        player_health += 1
+                                        # 从背包中移除药水
+                                        player_inventory.remove_item("health_potion")
+                                    elif product.name == "speed_potion":
+                                        # 增加主角的移动速度
+                                        player_speed += 1
+                                        # 启动加速状态
+                                        is_speed_boost_active = True
+                                        speed_boost_duration = 3000  # 3秒，以毫秒为单位
+                                        speed_boost_timer = pygame.time.get_ticks()
+                                        player_inventory.remove_item("speed_potion")
+                                    # 在你的物品使用逻辑中添加 jump_potion
+                                    elif product.name == "jump_potion" and not is_jump_potion_active:
+                                        # Store the original jump speed for later restoration
+                                        original_jump_speed = jump_speed
 
-            pygame.display.update()
+                                        # Triple the jump speed
+                                        jump_speed *= 3
+
+                                        # Remove the jump potion from the player's inventory
+                                        player_inventory.remove_item("jump_potion")
+
+                                        # Set a flag to indicate that a jump potion is active
+                                        is_jump_potion_active = True
+
+                                        # Set the duration for the jump potion effects (adjust as needed)
+                                        jump_potion_duration = 5.0  # 5 seconds, for example
+
+                                        # Add visual feedback, such as a glowing effect or particle system
+                                        # Example: player.activate_jump_visual_feedback()
+
+                    # 在主循环中检查是否仍然处于加速状态
+                if is_speed_boost_active:
+                    if speed_boost_duration > 0:
+                        # 更新主角的位置时使用增加后的速度
+                        player_x += player_speed
+                        speed_boost_duration -= (pygame.time.get_ticks() - speed_boost_timer)
+                    else:
+                        # 加速状态结束，重置速度
+                        is_speed_boost_active = False
+                        player_speed -= 1
+                        speed_boost_end_time = pygame.time.get_ticks()
+
+                    # 使用正常速度
+                player_x += normal_speed
+                if is_jump_potion_active:
+                    jump_potion_duration -= dt  # dt is the time since the last frame, adjust as needed
+                    if jump_potion_duration <= 0:
+                        is_jump_potion_active = False
+                        jump_speed = original_jump_speed  # Restore the original jump speed
+
+                # 在屏幕上方显示加速停止的提示
+                if is_speed_boost_active:
+                    # 显示加速中的提示
+                    pygame.draw.rect(SCREEN, (255, 0, 0), (0, 0, WIDTH, 30))  # 红色条作为背景
+                    speed_boost_text = font.render("加速中...", True, (255, 255, 255))
+                    SCREEN.blit(speed_boost_text, (10, 5))
+                elif pygame.time.get_ticks() - speed_boost_end_time < speed_boost_message_duration:
+                    # 显示加速停止的提示
+                    pygame.draw.rect(SCREEN, (0, 0, 255), (0, 0, WIDTH, 30))  # 蓝色条作为背景
+                    speed_boost_end_text = font.render("加速结束", True, (255, 255, 255))
+                    SCREEN.blit(speed_boost_end_text, (10, 5))
+
+                pygame.display.update()
+
 
 # 游戏结束
 pygame.quit()
