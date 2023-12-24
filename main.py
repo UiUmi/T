@@ -25,9 +25,9 @@ background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
 # 加载主角奔跑动画帧
 run_frames = [
-    pygame.image.load("run1.png"),
-    pygame.image.load("run2.png"),
-    pygame.image.load("run3.png")
+    pygame.image.load("player_run1.png"),
+    pygame.image.load("player_run2.png"),
+    pygame.image.load("player_run3.png")
 ]
 current_frame = 0
 player_image = run_frames[current_frame]
@@ -182,17 +182,51 @@ def load_player_data():
         # 如果文件不存在，使用默认值
         coins = 100
         player_inventory = []
+# 保存玩家数据
+def save_player_data():
+    with open("player_data.txt", "w") as file:
+        file.write(str(coins) + "\n")
+        for item in player_inventory.items:
+            file.write(item.name + "\n")
 
 # 在购买商品时的逻辑
 def buy_product(product):
     global coins
+    global player_inventory
+
     if coins >= product.price:
         coins -= product.price
         player_inventory.add_item(product.name)
         print(f"You bought {product.name} for {product.price} coins!")
 
+        # Check if the product is a player character before updating the player image
+        if product.name.startswith("player"):
+            change_player_image(product)
     else:
         print("Not enough coins!")
+
+
+
+def change_player_image(product):
+    # Check if the product is a player character before updating the player image
+    if product.name.startswith("player"):
+        # Load animation frames only for player characters
+        run_frames = [
+            pygame.image.load(f"{product.name}_run1.png"),
+            pygame.image.load(f"{product.name}_run2.png"),
+            pygame.image.load(f"{product.name}_run3.png")
+        ]
+
+        # Change to the new animation frames
+        global current_frame
+        current_frame = 0
+        global player_image
+        player_image = run_frames[current_frame]
+        player_image = pygame.transform.scale(player_image, (30, 30))
+
+
+
+
 
 # 在其他地方更新显示玩家的金币数量和背包
 def update_display():
@@ -215,10 +249,11 @@ product2 = Product("speed_potion", 5, "speed_potion.png")
 product3 = Product("jump_potion", 5, "jump_potion.png")
 product4= Product("ak_potion", 15, "ak_potion.png")
 product5= Product("player1", 30, "player1.png")
+product6= Product("player", 0, "player.png")
 
 # 创建商品列表
-products = [product1, product2, product3,product4,product5]
-num_of_products=5
+products = [product1, product2, product3,product4,product5,product6]
+num_of_products=6
 
 # 商品显示字体
 product_font = pygame.font.SysFont(None, 30)
@@ -516,6 +551,46 @@ while running:
                     quantity_text = f"x {item.quantity}"
                     quantity_surface = font.render(quantity_text, True, (255, 255, 255))
                     SCREEN.blit(quantity_surface, (x + 70, y + 20))
+                # 检查鼠标点击是否在背包中的物品上
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+
+                    # 检查鼠标点击是否在背包中的物品上
+                    for i, item in enumerate(player_inventory.items):
+                        row = i // items_per_row
+                        col = i % items_per_row
+                        x = inventory_box_pos[0] + 50 + col * 100
+                        y = inventory_box_pos[1] + 150 + row * item_spacing
+                        item_rect = pygame.Rect(x, y, 50, 50)
+
+                        if item_rect.collidepoint(mouse_pos):  # 检查鼠标是否点击了某个物品
+                            # 获取被点击的商品对象
+                            clicked_item = player_inventory.items[i]
+
+                            # 根据商品对象更新主角形象
+                            for product in products:
+                                if product.name == clicked_item.name:
+                                    # 检查商品是否是主角形象
+                                    if product.name.startswith("player"):
+                                        # 检查奔跑动画帧是否存在
+                                        run_frames_exist = all(
+                                            pygame.image.get_extended() for _ in range(3)  # Check for three frames
+                                        )
+                                        if run_frames_exist:
+                                            # 更新奔跑动画帧
+                                            run_frames = [
+                                                pygame.image.load(f"{product.name}_run1.png"),
+                                                pygame.image.load(f"{product.name}_run2.png"),
+                                                pygame.image.load(f"{product.name}_run3.png")
+                                            ]
+
+                                            # 切换到新的奔跑动画
+                                            current_frame = 0
+                                            player_image = run_frames[current_frame]
+                                            player_image = pygame.transform.scale(player_image, (30, 30))
+                                        else:
+                                            print(f"Run frames not found for {product.name}")
+                                        # 在这里可以执行购买商品的逻辑
 
             pygame.display.update()
 

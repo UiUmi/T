@@ -1,1 +1,3 @@
-90
+70
+player1
+player
