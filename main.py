@@ -81,7 +81,7 @@ menu_background = pygame.transform.scale(menu_background, (WIDTH, HEIGHT))
 
 # 加载开始和退出按钮以及title
 Title = pygame.image.load("Title.png")
-Title = pygame.transform.scale(Title, (800, 130))
+Title = pygame.transform.scale(Title, (1000, 730))
 start_button = pygame.image.load("start.png")
 start_button = pygame.transform.scale(start_button, (200, 150))
 exit_button = pygame.image.load("exit.png")
@@ -90,7 +90,7 @@ exit_button = pygame.transform.scale(exit_button, (200, 150))
 # 设置按钮位置
 start_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 - 20)
 exit_button_pos = (WIDTH // 2 - 100, HEIGHT // 2 + 80)
-Title_pos=(WIDTH//2-400,HEIGHT//2-250)
+Title_pos=(WIDTH//2-450,HEIGHT//2-420)
 
 # 标志，用于指示游戏是在菜单还是进行中
 in_menu = True
@@ -495,21 +495,27 @@ while running:
             if rule_box_open:
                 # 渲染 story_box_background.png 和相关文本
                 SCREEN.blit(rule_box_background, rule_box_pos)
-                # 其他渲染逻辑...
-            if inventory_box_open :
-                SCREEN.blit(inventory_box_background,inventory_box_pos)
+
+            if inventory_box_open:
+                SCREEN.blit(inventory_box_background, inventory_box_pos)
 
                 item_spacing = 60
+                items_per_row = 3  # 每行显示的物品数量
+
                 for i, item in enumerate(player_inventory.items):
+                    row = i // items_per_row  # 计算行数
+                    col = i % items_per_row  # 计算列数
+
                     item_image = pygame.image.load(f"{item.name}.png")  # 假设物品图片文件名与物品名相匹配
                     item_image = pygame.transform.scale(item_image, (50, 50))
-                    SCREEN.blit(item_image, (inventory_box_pos[0] + 50, inventory_box_pos[1] + 150 + i * item_spacing))
+                    x = inventory_box_pos[0] + 50 + col * 100  # 100 是每个物品之间的横向间隔
+                    y = inventory_box_pos[1] + 150 + row * item_spacing
+                    SCREEN.blit(item_image, (x, y))
 
                     # 显示物品数量
                     quantity_text = f"x {item.quantity}"
                     quantity_surface = font.render(quantity_text, True, (255, 255, 255))
-                    SCREEN.blit(quantity_surface,
-                                (inventory_box_pos[0] + 120, inventory_box_pos[1] + 170 + i * item_spacing))
+                    SCREEN.blit(quantity_surface, (x + 70, y + 20))
 
             pygame.display.update()
 
