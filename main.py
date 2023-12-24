@@ -214,7 +214,7 @@ product1 = Product("health_potion", 10, "health_potion.png")
 product2 = Product("speed_potion", 5, "speed_potion.png")
 product3 = Product("jump_potion", 5, "jump_potion.png")
 product4= Product("ak_potion", 15, "ak_potion.png")
-product5= Product("character1", 30, "character1.png")
+product5= Product("player1", 30, "player1.png")
 
 # 创建商品列表
 products = [product1, product2, product3,product4,product5]
