@@ -574,7 +574,7 @@ while running:
 
                 for i, item in enumerate(player_inventory.items):
                     row = i // items_per_row  # 计算行数
-                    col = i * items_per_row  # 计算列数
+                    col = i % items_per_row  # 计算列数
 
                     item_image = pygame.image.load(f"{item.name}.png")  # 假设物品图片文件名与物品名相匹配
                     item_image = pygame.transform.scale(item_image, (50, 50))
