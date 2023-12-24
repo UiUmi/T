@@ -101,11 +101,15 @@ store_icon = pygame.transform.scale(store_icon, (100, 100))
 store_icon_pos = (WIDTH - 100, 0)
 
 # 商店背景和按钮
+current_store_page = 0
 store_background = pygame.image.load("store.png")
 store_background = pygame.transform.scale(store_background, (300, 500))
-store_close_button = pygame.image.load("store_close_button.png")
-store_close_button = pygame.transform.scale(store_close_button, (84, 63))
-store_close_button_pos = (480, 530)
+store_last_button = pygame.image.load("store_last_button.png")
+store_last_button = pygame.transform.scale(store_last_button, (84, 63))
+store_last_button_pos = (480, 530)
+store_next_button = pygame.image.load("store_next_button.png")
+store_next_button = pygame.transform.scale(store_next_button, (84, 63))
+store_next_button_pos = (630, 530)
 in_store = False
 class InventoryItem:
     def __init__(self, name, quantity):
@@ -250,10 +254,13 @@ product3 = Product("jump_potion", 5, "jump_potion.png")
 product4= Product("ak_potion", 15, "ak_potion.png")
 product5= Product("player1", 30, "player1.png")
 product6= Product("player2", 0, "player2.png")
+product7= Product("weapon1", 0, "weapon1.png")
+product8= Product("player2", 0, "player2.png")
+
 
 # 创建商品列表
-products = [product1, product2, product3,product4,product5,product6]
-num_of_products=6
+products = [product1, product2, product3,product4,product5,product6,product7,product8]
+num_of_products=8
 
 # 商品显示字体
 product_font = pygame.font.SysFont(None, 30)
@@ -390,10 +397,12 @@ while running:
         if in_store:
             # 渲染商店页面
             SCREEN.blit(store_background, (450, 100))
-            SCREEN.blit(store_close_button, (480, 530))
-
+            SCREEN.blit(store_last_button, store_last_button_pos)
+            SCREEN.blit(store_next_button, store_next_button_pos)
             # 渲染商品
-            for i, product in enumerate(products):
+            start_index = current_store_page * 6
+            end_index = min((current_store_page + 1) * 6,num_of_products)
+            for i, product in enumerate(products[start_index:end_index]):
                 col = i % 2  # 每行最多显示2个商品
 
                 x = 480 + col * 118  # 根据列数计算 x 坐标
@@ -413,10 +422,16 @@ while running:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
 
-                # 检查鼠标点击是否在退出按钮上
-                if store_close_button_pos[0] < mouse_pos[0] < store_close_button_pos[0] + 84 \
-                        and store_close_button_pos[1] < mouse_pos[1] < store_close_button_pos[1] + 63:
-                    in_store = False
+                # 检查鼠标点击是否在上一页按钮上
+                if store_last_button_pos[0] < mouse_pos[0] < store_last_button_pos[0] + 84 \
+                        and store_last_button_pos[1] < mouse_pos[1] < store_last_button_pos[1] + 63:
+                    #切换到上一页
+                    current_store_page = max(0, current_store_page - 1)
+                    running = True
+                elif store_next_button_pos[0] < mouse_pos[0] < store_next_button_pos[0] + 84 \
+                        and store_next_button_pos[1] < mouse_pos[1] < store_next_button_pos[1] + 63:
+                    #切换到下一页
+                    current_store_page = min((len(products) - 1) // 6, current_store_page + 1)
                     running = True
                 else:
                     # 检查商品是否被点击
@@ -427,7 +442,7 @@ while running:
                         l=i%2
                         c=i//2
                         if 480 +l*118< mouse_pos[0] < 480+70 +l*118 and 220 + 101*c < mouse_pos[1] < 220 + 70 + 101*c:
-                            buy_product(products[i])
+                            buy_product(products[i+current_store_page*6])
                             pygame.time.delay(500)
 
 
@@ -587,7 +602,7 @@ while running:
                                             # 切换到新的奔跑动画
                                             current_frame = 0
                                             player_image = run_frames[current_frame]
-                                            player_image = pygame.transform.scale(player_image, (30, 30))
+                                            player_image = pygame.transform.scale(player_image, (60, 60))
                                         else:
                                             print(f"Run frames not found for {product.name}")
                                         # 在这里可以执行购买商品的逻辑
