@@ -45,6 +45,13 @@ player_speed = normal_speed
 jump_speed = 7
 gravity = 0.3
 
+# attack变量
+player_is_attacking = False
+player_attack_duration = 0.3
+player_attack_timer = 0.0
+player_attack_animation = pygame.image.load("player_attack_animation.png")  # 替换为你的攻击动画图片
+player_attack_animation = pygame.transform.scale(player_attack_animation, (60, 60))
+
 # 定义主角的位置和朝向
 player_x = 50
 player_y = HEIGHT - 240
@@ -53,6 +60,12 @@ is_facing_right = True
 # 跳跃状态
 is_jumping = False
 jump_velocity = 0
+
+##################跳跃
+# 在你的初始化部分定义以下变量
+original_jump_speed=7
+is_jump_potion_active = False
+jump_potion_duration = 0.0
 
 # 奔跑状态
 is_running = False
@@ -337,11 +350,7 @@ rule_button_pos= (WIDTH - 105, story_box_button_pos[1] + store_icon.get_height()
 is_speed_boost_active = False
 speed_boost_end_time = 0
 
-##################跳跃
-# 在你的初始化部分定义以下变量
-original_jump_speed=7
-is_jump_potion_active = False
-jump_potion_duration = 0.0
+
 # 游戏循环
 running = True
 while running:
@@ -469,10 +478,10 @@ while running:
             # 角色移动
             keys = pygame.key.get_pressed()
             if not in_store:
-                # 角色移动
+                # 角色移动和攻击
                 keys = pygame.key.get_pressed()
-
-
+                if keys[pygame.K_j]:
+                    player_is_attacking = True
 
                 if keys[pygame.K_a]:
                     player_x -= player_speed
@@ -484,6 +493,27 @@ while running:
                     is_facing_right = True  # 右移时朝向右
                 else:
                     is_running = False
+
+            if player_is_attacking:
+                if is_facing_right:
+                    # 攻击动作
+                    player_x += 10  # 向右快速移动
+
+                    # 渲染攻击动画
+                    SCREEN.blit(player_attack_animation, (player_x + 60, player_y))
+
+                else:
+                    # 攻击动作
+                    player_x -= 10  # 向右快速移动
+                    flipped_player_attack_animation = pygame.transform.flip(player_attack_animation, True, False)
+                    SCREEN.blit(flipped_player_attack_animation, (player_x - 60, player_y))
+
+                player_attack_timer += dt
+                # 攻击动画持续0.2s
+                if player_attack_timer >= player_attack_duration:
+                    player_is_attacking = False
+                    player_attack_timer = 0.0
+
 
             # 切换奔跑动画帧
             if is_running:
@@ -548,6 +578,25 @@ while running:
             SCREEN.blit(inventory_box_button, inventory_box_button_pos)
             #渲染规则框
             SCREEN.blit(rule_button, rule_button_pos)
+            if player_is_attacking:
+                if is_facing_right:
+                    # 攻击动作
+                    player_x += 4  # 向右快速移动
+
+                    # 渲染攻击动画
+                    SCREEN.blit(player_attack_animation, (player_x + 60, player_y))
+
+                else:
+                    # 攻击动作
+                    player_x -= 4  # 向右快速移动
+                    flipped_player_attack_animation = pygame.transform.flip(player_attack_animation, True, False)
+                    SCREEN.blit(flipped_player_attack_animation, (player_x - 60, player_y))
+
+                player_attack_timer += dt
+                # 攻击动画持续0.2s
+                if player_attack_timer >= player_attack_duration:
+                    player_is_attacking = False
+                    player_attack_timer = 0.0
             # 如果故事框打开，渲染故事文本
             if story_box_open:
                 SCREEN.blit(story_box_background, story_box_pos)
@@ -654,6 +703,8 @@ while running:
 
                                         # Add visual feedback, such as a glowing effect or particle system
                                         # Example: player.activate_jump_visual_feedback()
+                                    elif product.name == "ak_potion":
+                                        1
 
                     # 在主循环中检查是否仍然处于加速状态
             if is_speed_boost_active:
