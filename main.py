@@ -633,10 +633,10 @@ while running:
                                         player_inventory.remove_item("health_potion")
                                     elif product.name == "speed_potion":
                                         # 增加主角的移动速度
-                                        player_speed += 1
+                                        player_speed += 9
                                         # 启动加速状态
                                         is_speed_boost_active = True
-                                        speed_boost_duration = 3000  # 3秒，以毫秒为单位
+                                        speed_boost_duration = 5000  # 10秒，以毫秒为单位
                                         speed_boost_timer = pygame.time.get_ticks()
                                         player_inventory.remove_item("speed_potion")
                                     # 在你的物品使用逻辑中添加 jump_potion
@@ -663,33 +663,22 @@ while running:
                 if is_speed_boost_active:
                     if speed_boost_duration > 0:
                         # 更新主角的位置时使用增加后的速度
-                        player_x += player_speed
                         speed_boost_duration -= (pygame.time.get_ticks() - speed_boost_timer)
                     else:
                         # 加速状态结束，重置速度
                         is_speed_boost_active = False
-                        player_speed -= 1
+                        player_speed -= 9
                         speed_boost_end_time = pygame.time.get_ticks()
 
                     # 使用正常速度
-                player_x += normal_speed
+
                 if is_jump_potion_active:
                     jump_potion_duration -= dt  # dt is the time since the last frame, adjust as needed
                     if jump_potion_duration <= 0:
                         is_jump_potion_active = False
                         jump_speed = original_jump_speed  # Restore the original jump speed
 
-                # 在屏幕上方显示加速停止的提示
-                if is_speed_boost_active:
-                    # 显示加速中的提示
-                    pygame.draw.rect(SCREEN, (255, 0, 0), (0, 0, WIDTH, 30))  # 红色条作为背景
-                    speed_boost_text = font.render("加速中...", True, (255, 255, 255))
-                    SCREEN.blit(speed_boost_text, (10, 5))
-                elif pygame.time.get_ticks() - speed_boost_end_time < speed_boost_message_duration:
-                    # 显示加速停止的提示
-                    pygame.draw.rect(SCREEN, (0, 0, 255), (0, 0, WIDTH, 30))  # 蓝色条作为背景
-                    speed_boost_end_text = font.render("加速结束", True, (255, 255, 255))
-                    SCREEN.blit(speed_boost_end_text, (10, 5))
+
 
                 pygame.display.update()
 
