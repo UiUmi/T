@@ -641,7 +641,7 @@ while running:
                                         original_jump_speed = jump_speed
 
                                         # Triple the jump speed
-                                        jump_speed *= 3
+                                        jump_speed *= 2
 
                                         # Remove the jump potion from the player's inventory
                                         player_inventory.remove_item("jump_potion")
@@ -650,7 +650,7 @@ while running:
                                         is_jump_potion_active = True
 
                                         # Set the duration for the jump potion effects (adjust as needed)
-                                        jump_potion_duration = 5.0  # 5 seconds, for example
+                                        jump_potion_duration = 7.0  # 7 seconds, for example
 
                                         # Add visual feedback, such as a glowing effect or particle system
                                         # Example: player.activate_jump_visual_feedback()
@@ -668,11 +668,11 @@ while running:
 
                     # 使用正常速度
 
-                if is_jump_potion_active:
-                    jump_potion_duration -= dt  # dt is the time since the last frame, adjust as needed
-                    if jump_potion_duration <= 0:
-                        is_jump_potion_active = False
-                        jump_speed = original_jump_speed  # Restore the original jump speed
+            if is_jump_potion_active:
+                jump_potion_duration -= dt  # dt is the time since the last frame, adjust as needed
+                if jump_potion_duration <= 0:
+                    is_jump_potion_active = False
+                    jump_speed = original_jump_speed  # Restore the original jump speed
 
 
 
