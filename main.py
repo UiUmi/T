@@ -39,7 +39,7 @@ heart_image = pygame.image.load("heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
 
 # 设置速度和跳跃高度为 1
-normal_speed=2.6
+normal_speed=4.6
 player_speed = normal_speed
 
 jump_speed = 7
@@ -332,14 +332,11 @@ rule_button_pos= (WIDTH - 105, story_box_button_pos[1] + store_icon.get_height()
 
 
 
-#################速度
-speed_boost_amount = 1.0  # 初始速度增加量
-normal_speed = 2.6  # 默认速度
-player_speed = normal_speed  # 初始玩家速度
+
 # 在游戏循环之前定义变量
 is_speed_boost_active = False
 speed_boost_end_time = 0
-speed_boost_message_duration = 2000  # 2秒，以毫秒为单位
+
 ##################跳跃
 # 在你的初始化部分定义以下变量
 original_jump_speed=7
@@ -475,15 +472,14 @@ while running:
                 # 角色移动
                 keys = pygame.key.get_pressed()
 
-                # 在加速状态下，使用增加后的速度
-                current_speed = player_speed * speed_boost_amount
+
 
                 if keys[pygame.K_a]:
-                    player_x -= current_speed
+                    player_x -= player_speed
                     is_running = True
                     is_facing_right = False  # 左移时朝向左
                 elif keys[pygame.K_d]:
-                    player_x += current_speed
+                    player_x += player_speed
                     is_running = True
                     is_facing_right = True  # 右移时朝向右
                 else:
@@ -633,10 +629,10 @@ while running:
                                         player_inventory.remove_item("health_potion")
                                     elif product.name == "speed_potion":
                                         # 增加主角的移动速度
-                                        player_speed += 9
+                                        player_speed += 5
                                         # 启动加速状态
                                         is_speed_boost_active = True
-                                        speed_boost_duration = 5000  # 10秒，以毫秒为单位
+                                        speed_boost_duration = 800000  # 10秒，以毫秒为单位
                                         speed_boost_timer = pygame.time.get_ticks()
                                         player_inventory.remove_item("speed_potion")
                                     # 在你的物品使用逻辑中添加 jump_potion
@@ -660,15 +656,15 @@ while running:
                                         # Example: player.activate_jump_visual_feedback()
 
                     # 在主循环中检查是否仍然处于加速状态
-                if is_speed_boost_active:
-                    if speed_boost_duration > 0:
-                        # 更新主角的位置时使用增加后的速度
-                        speed_boost_duration -= (pygame.time.get_ticks() - speed_boost_timer)
-                    else:
-                        # 加速状态结束，重置速度
-                        is_speed_boost_active = False
-                        player_speed -= 9
-                        speed_boost_end_time = pygame.time.get_ticks()
+            if is_speed_boost_active:
+                if speed_boost_duration > 0:
+                    # 更新主角的位置时使用增加后的速度
+                    speed_boost_duration -= (pygame.time.get_ticks() - speed_boost_timer)
+                else:
+                    # 加速状态结束，重置速度
+                    is_speed_boost_active = False
+                    player_speed -= 5
+                    speed_boost_end_time = pygame.time.get_ticks()
 
                     # 使用正常速度
 
