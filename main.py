@@ -38,6 +38,14 @@ player_image = pygame.transform.scale(player_image, (60, 60))
 heart_image = pygame.image.load("heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
 
+# 加载map图像
+map = pygame.image.load("map.png")
+map = pygame.transform.scale(map, (700, 600))
+map_pos=(250,50)
+# 加载map_icon图像
+map_icon = pygame.image.load("map_icon.png")
+map_icon = pygame.transform.scale(map_icon, (100, 100))
+map_icon_pos=(-10,150)
 # 设置速度和跳跃高度为 1
 normal_speed=4.6
 player_speed = normal_speed
@@ -76,6 +84,9 @@ is_running = False
 #是否有Monster
 is_monster_exit=False
 
+#是否在主城
+is_in_main=True
+
 # 玩家血量
 player_health = 5
 
@@ -113,7 +124,7 @@ Title_pos=(WIDTH//2-450,HEIGHT//2-420)
 
 # 标志，用于指示游戏是在菜单还是进行中
 in_menu = True
-
+in_map = False
 # 加载商店图标
 store_icon = pygame.image.load("store_icon.png")
 store_icon = pygame.transform.scale(store_icon, (100, 100))
@@ -386,6 +397,10 @@ while running:
                 story_box_open = not story_box_open
                 if story_box_open:
                     subtitle_timer = pygame.time.get_ticks()  # 重新设置计时器
+            #map选择
+            elif map_pos[0] < mouse_pos[0] < map_pos[0] + 100 and map_pos[1] < mouse_pos[1] < map_pos[1] + 100:
+                in_map=not in_map
+
             elif music_box_button_pos[0] < mouse_pos[0] < music_box_button_pos[0] + 50 \
                     and music_box_button_pos[1] < mouse_pos[1] < music_box_button_pos[1] + 50:
                 music_box_open = not music_box_open
@@ -475,9 +490,7 @@ while running:
 
 
 
-
-
-        if not in_store:
+        if not in_store :
             # 角色移动
             keys = pygame.key.get_pressed()
             if not in_store:
@@ -496,6 +509,9 @@ while running:
                     is_facing_right = True  # 右移时朝向右
                 else:
                     is_running = False
+
+
+
 
             if player_is_attacking:
                 if is_facing_right:
@@ -572,7 +588,8 @@ while running:
             SCREEN.blit(coins_surface, coins_rect)
             # 渲染商店图标
             SCREEN.blit(store_icon, store_icon_pos)
-
+            # 渲染map图标
+            SCREEN.blit(map_icon, map_icon_pos)
             # 渲染故事框按钮
             SCREEN.blit(story_box_button, story_box_button_pos)
             # 渲染音乐框按钮
@@ -617,6 +634,9 @@ while running:
             if rule_box_open:
                 # 渲染 story_box_background.png 和相关文本
                 SCREEN.blit(rule_box_background, rule_box_pos)
+            if in_map:
+                SCREEN.blit(map, map_pos)
+
 
             if inventory_box_open:
                 SCREEN.blit(inventory_box_background, inventory_box_pos)
@@ -707,7 +727,7 @@ while running:
                                         # Add visual feedback, such as a glowing effect or particle system
                                         # Example: player.activate_jump_visual_feedback()
                                     elif product.name == "ak_potion":
-                                        1
+                                        player_damage+=1
 
                     # 在主循环中检查是否仍然处于加速状态
             if is_speed_boost_active:
