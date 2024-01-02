@@ -23,6 +23,15 @@ my_sound.set_volume(0.2)
 # 加载游戏背景图像
 background_image = pygame.image.load("bgp1.png")
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
+# 获取背景图像的宽度
+bg_width = background_image.get_width()
+
+# 定义背景滚动的速度
+scroll_speed = 2
+
+# 初始化背景的位置
+bg_x1 = 0
+bg_x2 = bg_width
 
 # 加载主角奔跑动画帧
 run_frames = [
@@ -748,9 +757,24 @@ while running:
                     is_jump_potion_active = False
                     jump_speed = original_jump_speed  # Restore the original jump speed
 
+    # 更新背景的位置
+    bg_x1 -= scroll_speed
+    bg_x2 -= scroll_speed
 
+    # 如果第一张背景完全移出屏幕，将其放到第二张背景的后面
 
-                pygame.display.update()
+    if bg_x1 <= -bg_width:
+        bg_x1 = bg_width
+
+                    # 如果第二张背景完全移出屏幕，将其放到第一张背景的后面
+    if bg_x2 <= -bg_width:
+        bg_x2 = bg_width
+
+                    # 绘制背景
+    SCREEN.blit(background_image, (bg_x1, 0))
+    SCREEN.blit(background_image, (bg_x2, 0))
+
+    pygame.display.update()
 
 
 # 游戏结束
