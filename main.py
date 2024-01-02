@@ -496,9 +496,6 @@ while running:
                             buy_product(products[i+current_store_page*6])
                             pygame.time.delay(500)
 
-
-
-
         if not in_store :
             # 角色移动
             keys = pygame.key.get_pressed()
@@ -508,6 +505,9 @@ while running:
                 if keys[pygame.K_j]:
                     player_is_attacking = True
                     bgp_move=True
+                if keys[pygame.K_m]:
+                    in_map=not in_map
+
                 if keys[pygame.K_a]:
                     player_x -= player_speed
                     is_running = True
