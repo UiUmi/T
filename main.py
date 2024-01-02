@@ -43,6 +43,8 @@ current_frame = 0
 player_image = run_frames[current_frame]
 player_image = pygame.transform.scale(player_image, (60, 60))
 
+is_in_city=True
+
 # 加载红色爱心图像
 heart_image = pygame.image.load("heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
@@ -268,6 +270,19 @@ def change_player_image(product):
         player_image = pygame.transform.scale(player_image, (60, 60))
 
 
+class LevelButton:
+    def __init__(self, rect, level):
+        self.rect = rect  # pygame.Rect 对象，表示按钮在屏幕上的位置和大小
+        self.level = level  # 与按钮关联的关卡
+
+# 在初始化部分或其他适当的地方创建关卡按钮对象并添加到 level_buttons 列表中
+level_buttons = []
+
+# 示例：创建两个关卡按钮，分别关联关卡 1 和关卡 2
+button_rect1 = pygame.Rect(100, 200, 50, 30)  # 根据实际需求设置按钮位置和大小
+button_rect2 = pygame.Rect(200, 200, 50, 30)
+level_buttons.append(LevelButton(button_rect1, level=1))
+level_buttons.append(LevelButton(button_rect2, level=2))
 
 
 
@@ -397,17 +412,17 @@ while running:
 
             # 检查鼠标点击是否在商店图标上
             elif store_icon_pos[0] < mouse_pos[0] < store_icon_pos[0] + 100 \
-                    and store_icon_pos[1] < mouse_pos[1] < store_icon_pos[1] + 100:
+                    and store_icon_pos[1] < mouse_pos[1] < store_icon_pos[1] + 100 and is_in_city:
                 in_store = not in_store
 
             # 检查鼠标点击是否在故事框按钮上
             elif story_box_button_pos[0] < mouse_pos[0] < story_box_button_pos[0] + 100 \
-                    and story_box_button_pos[1] < mouse_pos[1] < story_box_button_pos[1] + 100:
+                    and story_box_button_pos[1] < mouse_pos[1] < story_box_button_pos[1] + 100 and is_in_city:
                 story_box_open = not story_box_open
                 if story_box_open:
                     subtitle_timer = pygame.time.get_ticks()  # 重新设置计时器
             #map选择
-            elif map_pos[0] < mouse_pos[0] < map_pos[0] + 100 and map_pos[1] < mouse_pos[1] < map_pos[1] + 100:
+            elif map_icon_pos[0] < mouse_pos[0] < map_icon_pos[0] + 100 and map_icon_pos[1] < mouse_pos[1] < map_icon_pos[1] + 100 and is_in_city:
                 in_map=not in_map
 
             elif music_box_button_pos[0] < mouse_pos[0] < music_box_button_pos[0] + 50 \
@@ -426,7 +441,7 @@ while running:
 
                 inventory_box_open = not inventory_box_open
             elif rule_button_pos[0] < mouse_pos[0] < rule_button_pos[0] + 110 and rule_button_pos[1] < mouse_pos \
-                [1] < rule_button_pos[1] + 95:
+                [1] < rule_button_pos[1] + 95 and is_in_city:
 
                 rule_box_open = not rule_box_open
 
@@ -504,10 +519,6 @@ while running:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_j]:
                     player_is_attacking = True
-                    bgp_move=True
-                if keys[pygame.K_m]:
-                    in_map=not in_map
-
                 if keys[pygame.K_a]:
                     player_x -= player_speed
                     is_running = True
@@ -606,19 +617,26 @@ while running:
             SCREEN.blit(coins_icon, (coin_x, coin_y))
             SCREEN.blit(coins_surface, coins_rect)
             # 渲染商店图标
-            SCREEN.blit(store_icon, store_icon_pos)
-            # 渲染map图标
-            SCREEN.blit(map_icon, map_icon_pos)
-            # 渲染故事框按钮
-            SCREEN.blit(story_box_button, story_box_button_pos)
+            if is_in_city:
+                SCREEN.blit(store_icon, store_icon_pos)
+                # 渲染map图标
+                SCREEN.blit(map_icon, map_icon_pos)
+                # 渲染规则框
+                SCREEN.blit(rule_button, rule_button_pos)
+                # 渲染故事框按钮
+                SCREEN.blit(story_box_button, story_box_button_pos)
             # 渲染音乐框按钮
             SCREEN.blit(music_box_button, music_box_button_pos)
             # 渲染背包框
             SCREEN.blit(inventory_box_button, inventory_box_button_pos)
-            #渲染规则框
-            SCREEN.blit(rule_button, rule_button_pos)
             if in_map:
                 SCREEN.blit(map, map_pos)
+                for level_button in level_buttons:
+                    if level_button.rect.collidepoint(mouse_pos):
+                        selected_level = level_button.level
+                        # 执行关卡选择的逻辑
+
+                        in_map = False
             if player_is_attacking:
                 if is_facing_right:
                     # 攻击动作
