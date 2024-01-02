@@ -437,7 +437,7 @@ while running:
 
             # 检查鼠标点击是否在商店图标上
             elif store_icon_pos[0] < mouse_pos[0] < store_icon_pos[0] + 100 \
-                    and store_icon_pos[1] < mouse_pos[1] < store_icon_pos[1] + 100 and is_in_city:
+                    and store_icon_pos[1] < mouse_pos[1] < store_icon_pos[1] + 100 :
                 in_store = not in_store
 
             # 检查鼠标点击是否在故事框按钮上
@@ -496,7 +496,7 @@ while running:
             for i, product in enumerate(products[start_index:end_index]):
                 col = i % 2  # 每行最多显示2个商品
 
-                x = 480 + col * 118  # 根据列数计算 x 坐标
+                x = 500 + col * 118  # 根据列数计算 x 坐标
                 y = 220 + (i // 2) * 101  # 计算 y 坐标，每两个商品一行
 
                 product_rect = SCREEN.blit(product.image, (x, y))
@@ -651,13 +651,15 @@ while running:
             SCREEN.blit(coins_surface, coins_rect)
             # 渲染商店图标
             if is_in_city:
-                SCREEN.blit(store_icon, store_icon_pos)
+
                 # 渲染map图标
                 SCREEN.blit(map_icon, map_icon_pos)
                 # 渲染规则框
                 SCREEN.blit(rule_button, rule_button_pos)
                 # 渲染故事框按钮
                 SCREEN.blit(story_box_button, story_box_button_pos)
+            #在关卡内部和主城中都渲染商店
+            SCREEN.blit(store_icon, store_icon_pos)
             # 渲染音乐框按钮
             SCREEN.blit(music_box_button, music_box_button_pos)
             # 渲染背包框
@@ -784,7 +786,7 @@ while running:
                                         speed_boost_duration = 800000  # 10秒，以毫秒为单位
                                         speed_boost_timer = pygame.time.get_ticks()
                                         player_inventory.remove_item("speed_potion")
-                                    # 在你的物品使用逻辑中添加 jump_potion
+                                    # 在物品使用逻辑中添加 jump_potion
                                     elif product.name == "jump_potion" and not is_jump_potion_active:
                                         # Store the original jump speed for later restoration
                                         original_jump_speed = jump_speed
