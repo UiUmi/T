@@ -21,7 +21,7 @@ my_sound = pygame.mixer.Sound('music\music.mp3')
 my_sound.set_volume(0.2)
 
 # 加载游戏背景图像
-background_image = pygame.image.load("bgp1.png")
+background_image = pygame.image.load("city.png")
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 # 获取背景图像的宽度
 bg_width = background_image.get_width()
@@ -42,6 +42,15 @@ run_frames = [
 current_frame = 0
 player_image = run_frames[current_frame]
 player_image = pygame.transform.scale(player_image, (60, 60))
+
+monster1_run_frames = [
+    pygame.image.load("monster1_run1.png"),
+    pygame.image.load("monster1_run2.png"),
+    pygame.image.load("monster1_run3.png")
+]
+monster1_current_frame = 0
+monster1_image = run_frames[current_frame]
+monster1_image = pygame.transform.scale(monster1_image, (60, 60))
 
 is_in_city=True
 
@@ -93,7 +102,7 @@ jump_potion_duration = 0.0
 is_running = False
 
 #是否有Monster
-is_monster_exit=False
+is_monster_exist=False
 
 #是否在主城
 is_in_main=True
@@ -206,7 +215,7 @@ coins_rect = coins_surface.get_rect()
 
 # 设置文本位置
 coins_rect.center = (90, 75)
-
+selected_level=0
 # 保存玩家数据
 def save_player_data():
     with open("player_data.txt", "w") as file:
@@ -391,6 +400,15 @@ speed_boost_end_time = 0
 level1 = pygame.image.load("level1.png")
 level1 = pygame.transform.scale(level1, (100, 100))
 level1_pos = (350,280)
+
+
+monsters = [pygame.image.load("monster1.png") for _ in range(4)]
+monster_positions = [(700 + i * 50, HEIGHT - 240) for i in range(4)]
+monsters_rects = [monster.get_rect(topleft=pos) for monster, pos in zip(monsters, monster_positions)]
+monster_speed = 3  # 设置怪物的移动速度
+monster_jump_velocity=0
+monster_run_frames = [pygame.image.load(f"monster1_run{i+1}.png") for i in range(3)]
+
 
 level2 = pygame.image.load("level2.png")
 level2 = pygame.transform.scale(level2, (100, 100))
@@ -585,11 +603,19 @@ while running:
             if player_y < player_ground and not is_jumping:
                 player_y -= jump_velocity
                 jump_velocity -= gravity
+            if is_monster_exist :
+                for i, monster_rect in enumerate(monsters_rects):
+                    if monsters_rects[i].y < player_ground:
+                        monsters_rects[i].y -= monster_jump_velocity
+                        monster_jump_velocity -= gravity
 
             # 限制主角在窗口范围内
             player_x = max(0, min(player_x, WIDTH - 30))
             player_y = max(0, min(player_y, player_ground))
-
+            if is_monster_exist:
+                for i, monster_rect in enumerate(monsters_rects):
+                    monsters_rects[i].x = max(0, min(monsters_rects[i].x, WIDTH - 30))
+                    monsters_rects[i].y = max(0, min(monsters_rects[i].y, player_ground))
             # 渲染背景
             SCREEN.blit(background_image, (0, 0))
 
@@ -645,9 +671,11 @@ while running:
                         selected_level = level_button.level
                         # 执行关卡选择的逻辑
                         if selected_level==1:
-                            1
+                            background_image = pygame.image.load("level1_bgp.png")
+                            background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
                         elif selected_level==2:
-                            1
+                            background_image = pygame.image.load("level2_bgp.png")
+                            background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
                         is_in_city=False
                         in_map = False
             if player_is_attacking:
@@ -796,7 +824,27 @@ while running:
                 if jump_potion_duration <= 0:
                     is_jump_potion_active = False
                     jump_speed = original_jump_speed  # Restore the original jump speed
+            if selected_level == 1:
+                # 生成怪物（在屏幕右侧固定位置生成）
+                is_monster_exist=True
+                for i, monster_rect in enumerate(monsters_rects):
 
+                    if player_x < monster_rect.x:  # 如果玩家在怪物的左边
+                        monsters_rects[i].x -= monster_speed
+
+                    elif player_x > monster_rect.x:  # 如果玩家在怪物的右边
+                        monsters_rects[i].x += monster_speed
+
+
+
+                i=0
+                for monster_rect in monsters_rects:
+                    SCREEN.blit(monsters[i], monster_rect)  # 使用正确的怪物图像
+                    i+=1
+
+
+            elif selected_level==2:
+                1
 
 
     pygame.display.update()
