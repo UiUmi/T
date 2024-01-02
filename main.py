@@ -28,7 +28,7 @@ bg_width = background_image.get_width()
 
 # 定义背景滚动的速度
 scroll_speed = 2
-
+bgp_move=False
 # 初始化背景的位置
 bg_x1 = 0
 bg_x2 = bg_width
@@ -507,7 +507,7 @@ while running:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_j]:
                     player_is_attacking = True
-
+                    bgp_move=True
                 if keys[pygame.K_a]:
                     player_x -= player_speed
                     is_running = True
@@ -518,10 +518,6 @@ while running:
                     is_facing_right = True  # 右移时朝向右
                 else:
                     is_running = False
-
-
-
-
             if player_is_attacking:
                 if is_facing_right:
                     # 攻击动作
@@ -579,17 +575,31 @@ while running:
             # 渲染背景
             SCREEN.blit(background_image, (0, 0))
 
+            if bgp_move:
+                # 更新背景的位置
+                bg_x1 -= scroll_speed
+                bg_x2 -= scroll_speed
+                # 如果第一张背景完全移出屏幕，将其放到第二张背景的后面
+                if bg_x1 <= -bg_width:
+                    bg_x1 = bg_width
+                    bgp_move = False
+                # 如果第二张背景完全移出屏幕，将其放到第一张背景的后面
+                if bg_x2 <= -bg_width:
+                    bg_x2 = bg_width
+                    bgp_move = False
+                player_x-=scroll_speed
+            # 绘制背景
+                SCREEN.blit(background_image, (bg_x1, 0))
+                SCREEN.blit(background_image, (bg_x2, 0))
             # 根据朝向渲染角色
             if is_facing_right:
                 SCREEN.blit(player_image, (player_x, player_y))
             else:
                 flipped_player_image = pygame.transform.flip(player_image, True, False)
                 SCREEN.blit(flipped_player_image, (player_x, player_y))
-
-            # 渲染血量指示器
+            # 渲染血量指示
             for i in range(player_health):
                 SCREEN.blit(heart_image, (heart_x + i * heart_spacing, heart_y))
-
             # 渲染金币指示器
             num_of_coins = f"x {coins}"
             coins_surface = font.render(num_of_coins, True, (255, 255, 255))
@@ -607,11 +617,12 @@ while running:
             SCREEN.blit(inventory_box_button, inventory_box_button_pos)
             #渲染规则框
             SCREEN.blit(rule_button, rule_button_pos)
+            if in_map:
+                SCREEN.blit(map, map_pos)
             if player_is_attacking:
                 if is_facing_right:
                     # 攻击动作
                     player_x += 4  # 向右快速移动
-
                     # 渲染攻击动画
                     SCREEN.blit(player_attack_animation, (player_x + 60, player_y))
 
@@ -640,12 +651,10 @@ while running:
                 else:
                     # 当字幕全部显示完毕后，重新开始循环
                     subtitle_timer = pygame.time.get_ticks()
+
             if rule_box_open:
                 # 渲染 story_box_background.png 和相关文本
                 SCREEN.blit(rule_box_background, rule_box_pos)
-            if in_map:
-                SCREEN.blit(map, map_pos)
-
 
             if inventory_box_open:
                 SCREEN.blit(inventory_box_background, inventory_box_pos)
@@ -757,22 +766,7 @@ while running:
                     is_jump_potion_active = False
                     jump_speed = original_jump_speed  # Restore the original jump speed
 
-    # 更新背景的位置
-    bg_x1 -= scroll_speed
-    bg_x2 -= scroll_speed
 
-    # 如果第一张背景完全移出屏幕，将其放到第二张背景的后面
-
-    if bg_x1 <= -bg_width:
-        bg_x1 = bg_width
-
-                    # 如果第二张背景完全移出屏幕，将其放到第一张背景的后面
-    if bg_x2 <= -bg_width:
-        bg_x2 = bg_width
-
-                    # 绘制背景
-    SCREEN.blit(background_image, (bg_x1, 0))
-    SCREEN.blit(background_image, (bg_x2, 0))
 
     pygame.display.update()
 
