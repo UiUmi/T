@@ -279,8 +279,8 @@ class LevelButton:
 level_buttons = []
 
 # 示例：创建两个关卡按钮，分别关联关卡 1 和关卡 2
-button_rect1 = pygame.Rect(100, 200, 50, 30)  # 根据实际需求设置按钮位置和大小
-button_rect2 = pygame.Rect(200, 200, 50, 30)
+button_rect1 = pygame.Rect(350, 280, 100, 100)  # 根据实际需求设置按钮位置和大小
+button_rect2 = pygame.Rect(550, 280, 100, 100)
 level_buttons.append(LevelButton(button_rect1, level=1))
 level_buttons.append(LevelButton(button_rect2, level=2))
 
@@ -388,6 +388,13 @@ rule_button_pos= (WIDTH - 105, story_box_button_pos[1] + store_icon.get_height()
 is_speed_boost_active = False
 speed_boost_end_time = 0
 
+level1 = pygame.image.load("level1.png")
+level1 = pygame.transform.scale(level1, (100, 100))
+level1_pos = (350,280)
+
+level2 = pygame.image.load("level2.png")
+level2 = pygame.transform.scale(level2, (100, 100))
+level2_pos = (550,280)
 
 # 游戏循环
 running = True
@@ -631,11 +638,17 @@ while running:
             SCREEN.blit(inventory_box_button, inventory_box_button_pos)
             if in_map:
                 SCREEN.blit(map, map_pos)
+                SCREEN.blit(level1, level1_pos)
+                SCREEN.blit(level2, level2_pos)
                 for level_button in level_buttons:
                     if level_button.rect.collidepoint(mouse_pos):
                         selected_level = level_button.level
                         # 执行关卡选择的逻辑
-
+                        if selected_level==1:
+                            1
+                        elif selected_level==2:
+                            1
+                        is_in_city=False
                         in_map = False
             if player_is_attacking:
                 if is_facing_right:
