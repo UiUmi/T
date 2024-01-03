@@ -362,9 +362,10 @@ inventory_box_background = pygame.transform.scale(story_box_background, (500, 50
 
 
 rule_box_open = False
-rule_box_pos = (WIDTH/2-550, -50)
+rule_box_pos = (WIDTH/2-550, -115)
+rule_box_pos = (rule_box_pos[0], rule_box_pos[1] - 10)
 rule_box_background = pygame.image.load("rule_box_background.png")
-rule_box_background = pygame.transform.scale(rule_box_background, (1100, 700))
+rule_box_background = pygame.transform.scale(rule_box_background, (1100, 1000))
 
 #######各个图标的建立
 # 故事框按钮
@@ -748,8 +749,11 @@ while running:
                     # 当字幕全部显示完毕后，重新开始循环
                     subtitle_timer = pygame.time.get_ticks()
 
-            if rule_box_open:
+
                 # 渲染 story_box_background.png 和相关文本
+            if rule_box_open:
+
+
                 SCREEN.blit(rule_box_background, rule_box_pos)
 
             if inventory_box_open:
