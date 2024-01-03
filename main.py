@@ -394,19 +394,21 @@ is_speed_boost_active = False
 speed_boost_end_time = 0
 
 class Monster:
-    def __init__(self,name,health,speed,image_path,damage):
+    def __init__(self,name,health,speed,image_path,damage,size):
         self.name=name
         self.damage = damage
+        self.size = size
         self.health=health
         self.speed = speed
         self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (60, 60))
+        self.image = pygame.transform.scale(self.image, size)
         self.run_frames = [pygame.image.load(f"{name}_run{i + 1}.png") for i in range(3)]
 
-monster1=Monster(name="monster1",health=10,speed=2,image_path="monster1.png",damage=1)
-monster2=Monster(name="monster2",health=5,speed=3,image_path="monster2.png",damage=2)
+monster1=Monster(name="monster1",health=10,speed=2,image_path="monster1.png",damage=1,size=(60,60))
+monster2=Monster(name="monster2",health=5,speed=3,image_path="monster2.png",damage=2,size=(50,50))
+Boss=Monster(name="Boss",health=100,speed=0,image_path="Boss.png",damage=3,size=(200, 400))
 
-
+last_spawn_time=pygame.time.get_ticks()
 class Exist_Monster:
     def __init__(self,name,pos,current_frame,is_facing_right,dect,move_counter,is_moving):
         self.current_frame = current_frame
@@ -442,15 +444,26 @@ exist_monster3_3=Exist_Monster(name=monster1,pos=(200, HEIGHT - 240),current_fra
 exist_monster3_4=Exist_Monster(name=monster2,pos=(800, HEIGHT - 440),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
 exist_monster3_5=Exist_Monster(name=monster2,pos=(750, HEIGHT - 440),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
 
+
 level1_1_monsters=[exist_monster1_0,exist_monster1_1,exist_monster1_2]
 level1_2_monsters=[exist_monster2_0,exist_monster2_1,exist_monster2_2,exist_monster2_3,exist_monster2_4]
 level1_3_monsters=[exist_monster3_0,exist_monster3_1,exist_monster3_2,exist_monster3_3,exist_monster3_4,exist_monster3_5]
+
+
 
 level2 = pygame.image.load("level2.png")
 level2 = pygame.transform.scale(level2, (100, 100))
 level2_pos = (550,280)
 
 
+exist_Boss=Exist_Monster(name=Boss,pos=(900,HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster2__1=Exist_Monster(name=monster1,pos=(800, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster2__2=Exist_Monster(name=monster1,pos=(200, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster2__3=Exist_Monster(name=monster2,pos=(800, HEIGHT - 440),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster2__4=Exist_Monster(name=monster2,pos=(750, HEIGHT - 440),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
+
+
+level2_monsters=[exist_monster2__1,exist_monster2__2,exist_monster2__3,exist_monster2__4,exist_Boss]
 
 bullets=[]
 bullet_image=pygame.image.load("Bullet.png")
@@ -652,7 +665,7 @@ while running:
 
             if is_monster_exist :
                 for m in exist_monsters:
-                    if m.name!=monster2:
+                    if m.name==monster1:
                         if m.pos[1] < player_ground or m.jump_velocity!=0:
                             m.pos=(m.pos[0] ,m.pos[1]- m.jump_velocity)
                             m.jump_velocity -= gravity
@@ -662,7 +675,11 @@ while running:
             player_y = max(0, min(player_y, player_ground))
             if is_monster_exist:
                 for m in exist_monsters:
-                    m.pos = (max(0, min(m.pos[0], WIDTH - 30)),max(0, min(m.pos[1], player_ground)))
+                    if m.name==Boss:
+                        m.pos = (max(0, min(m.pos[0], WIDTH - 30)),max(0, min(m.pos[1], player_ground-150)))
+                    else:
+                        m.pos = (max(0, min(m.pos[0], WIDTH - 30)), max(0, min(m.pos[1], player_ground)))
+
             # 渲染背景
             SCREEN.blit(background_image, (0, 0))
 
@@ -687,8 +704,15 @@ while running:
                 for m in exist_monsters:
                     if m.is_facing_right==-1:
                         flipped_m = pygame.transform.flip(m.name.image, True, False)
+                        if m.name==Boss:
+                            flipped_m=pygame.image.load("Boss.png")
+                            flipped_m = pygame.transform.flip(flipped_m, True, False)
+                            flipped_m=pygame.transform.scale(flipped_m, m.name.size)
                         SCREEN.blit(flipped_m, m.pos)
                     else:
+                        if m.name==Boss:
+                            m.name.image = pygame.image.load("Boss.png")
+                            m.name.image=pygame.transform.scale(m.name.image, m.name.size)
                         SCREEN.blit(m.name.image, m.pos)
             if is_facing_right:
                 SCREEN.blit(player_image, (player_x, player_y))
@@ -907,8 +931,19 @@ while running:
                     background_image = pygame.image.load("city.png")
                     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
             elif selected_level==2:
-                1
-
+                if current_level_start:
+                    is_monster_exist = True
+                    exist_monsters = level2_monsters.copy()
+                    current_level_start=False
+                    last_spawn_time=pygame.time.get_ticks()
+                if  ((pygame.time.get_ticks()-last_spawn_time)>2 and Boss in exist_monsters):
+                    exist_monsters += level2_monsters.copy()
+                    last_spawn_time = pygame.time.get_ticks()
+                if len(exist_monsters)==0 and not current_level_start:
+                    selected_level=0
+                    is_in_city = True
+                    background_image = pygame.image.load("city.png")
+                    background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
             for m in exist_monsters:
                 if abs(player_x - m.pos[0])<200 and not m.dect:
                     m.dect=True
@@ -960,11 +995,19 @@ while running:
                         monster_attack_timer = 0.0
 
                 if player_is_attacking:
-                    if player_x+60<m.pos[0]<player_x+120 and player_y-10<=m.pos[1]<=player_y+70:
-                        m.jump_velocity=3
-                        m.health-=player_damage
-                        if m.health<=0:
-                            exist_monsters.remove(m)
+                    if m.name==Boss:
+                        if player_x -140 < m.pos[0] < player_x + 120 and player_y - 200 <= m.pos[1] <= player_y + 70:
+                            m.jump_velocity = 3
+                            m.health -= player_damage
+                            if m.health <= 0:
+                                exist_monsters.remove(m)
+                    else:
+                        if player_x + 60 < m.pos[0] < player_x + 120 and player_y - 10 <= m.pos[1] <= player_y + 70:
+                            m.jump_velocity = 3
+                            m.health -= player_damage
+                            if m.health <= 0:
+                                exist_monsters.remove(m)
+
 
                 if not player_is_attacking and m.is_attacking and pygame.time.get_ticks()-player_last_get_attack_time>700:
                     if player_x  < m.pos[0] < player_x + 60 and player_y <= m.pos[1] <= player_y + 60:
@@ -977,7 +1020,7 @@ while running:
                 if p[1] > player_ground+50:
                     bullets_to_remove.append(i)  # 如果子弹超出屏幕，从列表中移除
                 if player_x-20<p[0]<player_x+50 and player_y<p[1]<player_y+50:
-                    player_health-=1
+                    player_health-=2
                     bullets_to_remove.append(i)
 
             for i in reversed(bullets_to_remove):
