@@ -20,7 +20,7 @@ pygame.mixer.music.load('music\music.mp3')  # 加载音乐文件，确保文件�
 my_sound = pygame.mixer.Sound('music\music.mp3')
 #my_sound.play(-1)  # 无限循环播放
 my_sound.set_volume(0.2)
-
+level2_lock=True
 # 加载游戏背景图像
 background_image = pygame.image.load("city.png")
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
@@ -755,14 +755,18 @@ while running:
                     if level_button.rect.collidepoint(mouse_pos):
                         selected_level = level_button.level
                         # 执行关卡选择的逻辑
-                        if selected_level==1:
+                        if selected_level == 1:
                             background_image = pygame.image.load("level1_bgp.png")
                             background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
-                        elif selected_level==2:
+                            is_in_city = False
+                            in_map = False
+                        elif selected_level == 2 and not level2_lock:
                             background_image = pygame.image.load("level2_bgp.png")
                             background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
-                        is_in_city=False
-                        in_map = False
+                            is_in_city = False
+                            in_map = False
+                        if level2_lock and selected_level == 2:
+                            selected_level = 0
             if player_is_attacking:
 
                 if is_facing_right:
