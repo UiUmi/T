@@ -77,7 +77,7 @@ player_attack_animation = pygame.transform.scale(player_attack_animation, (60, 6
 player_last_get_attack_time=pygame.time.get_ticks()
 #人物撞击伤害
 player_damage=1
-
+current_level_start=True
 # 定义主角的位置和朝向
 player_x = 50
 player_y = HEIGHT - 240
@@ -403,6 +403,7 @@ class Monster:
         self.run_frames = [pygame.image.load(f"{name}_run{i + 1}.png") for i in range(3)]
 
 monster1=Monster(name="monster1",health=10,speed=2,image_path="monster1.png",damage=1)
+monster2=Monster(name="monster2",health=5,speed=3,image_path="monster2.png",damage=2)
 
 
 class Exist_Monster:
@@ -425,15 +426,34 @@ exist_monsters=[]
 level1 = pygame.image.load("level1.png")
 level1 = pygame.transform.scale(level1, (100, 100))
 level1_pos = (350,280)
-exist_monster0=Exist_Monster(name=monster1,pos=(700, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
-exist_monster1=Exist_Monster(name=monster1,pos=(750, HEIGHT - 240),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
-exist_monster2=Exist_Monster(name=monster1,pos=(800, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
-level1_1_monsters=[exist_monster0,exist_monster1,exist_monster2]
+exist_monster1_0=Exist_Monster(name=monster1,pos=(700, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster1_1=Exist_Monster(name=monster1,pos=(750, HEIGHT - 240),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
+exist_monster1_2=Exist_Monster(name=monster1,pos=(800, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster2_0=Exist_Monster(name=monster1,pos=(700, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster2_1=Exist_Monster(name=monster1,pos=(750, HEIGHT - 240),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
+exist_monster2_2=Exist_Monster(name=monster1,pos=(800, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster2_3=Exist_Monster(name=monster1,pos=(200, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster2_4=Exist_Monster(name=monster1,pos=(250, HEIGHT - 240),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
+exist_monster3_0=Exist_Monster(name=monster1,pos=(700, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster3_1=Exist_Monster(name=monster1,pos=(750, HEIGHT - 240),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
+exist_monster3_2=Exist_Monster(name=monster1,pos=(800, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster3_3=Exist_Monster(name=monster1,pos=(200, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster3_4=Exist_Monster(name=monster2,pos=(800, HEIGHT - 440),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster3_5=Exist_Monster(name=monster2,pos=(750, HEIGHT - 440),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
 
+level1_1_monsters=[exist_monster1_0,exist_monster1_1,exist_monster1_2]
+level1_2_monsters=[exist_monster2_0,exist_monster2_1,exist_monster2_2,exist_monster2_3,exist_monster2_4]
+level1_3_monsters=[exist_monster3_0,exist_monster3_1,exist_monster3_2,exist_monster3_3,exist_monster3_4,exist_monster3_5]
 
 level2 = pygame.image.load("level2.png")
 level2 = pygame.transform.scale(level2, (100, 100))
 level2_pos = (550,280)
+
+
+
+bullets=[]
+bullet_image=pygame.image.load("Bullet.png")
+bullet_image = pygame.transform.scale(bullet_image, (30, 30))
 
 # 游戏循环
 running = True
@@ -579,31 +599,24 @@ while running:
                 if is_facing_right:
                     # 攻击动作
                     player_x += 10  # 向右快速移动
-
                     # 渲染攻击动画
                     SCREEN.blit(player_attack_animation, (player_x + 60, player_y))
-
                 else:
                     # 攻击动作
                     player_x -= 10  # 向右快速移动
                     flipped_player_attack_animation = pygame.transform.flip(player_attack_animation, True, False)
                     SCREEN.blit(flipped_player_attack_animation, (player_x - 60, player_y))
-
                 player_attack_timer += dt
                 # 攻击动画持续0.2s
                 if player_attack_timer >= player_attack_duration:
                     player_is_attacking = False
                     player_attack_timer = 0.0
-
-
             # 切换奔跑动画帧
             if is_running:
                 current_frame = (current_frame + 1) % len(run_frames)
                 player_image = run_frames[current_frame]
                 player_image = pygame.transform.scale(player_image, (60, 60))
-
             if is_monster_exist:
-
                 for m in exist_monsters:
                     if m.is_moving==1:
                         m.current_frame = (m.current_frame + 1) % len(m.name.run_frames)
@@ -631,11 +644,17 @@ while running:
             if (player_y < player_ground and not is_jumping)or jump_velocity!=0:
                 player_y -= jump_velocity
                 jump_velocity -= gravity
+
+
+
+
+
             if is_monster_exist :
                 for m in exist_monsters:
-                    if m.pos[1] < player_ground or m.jump_velocity!=0:
-                        m.pos=(m.pos[0] ,m.pos[1]- m.jump_velocity)
-                        m.jump_velocity -= gravity
+                    if m.name!=monster2:
+                        if m.pos[1] < player_ground or m.jump_velocity!=0:
+                            m.pos=(m.pos[0] ,m.pos[1]- m.jump_velocity)
+                            m.jump_velocity -= gravity
 
             # 限制主角在窗口范围内
             player_x = max(0, min(player_x, WIDTH - 30))
@@ -858,11 +877,31 @@ while running:
                 if jump_potion_duration <= 0:
                     is_jump_potion_active = False
                     jump_speed = original_jump_speed  # Restore the original jump speed
-            if selected_level == 1:
+            if 1<=selected_level<2:
                 # 生成怪物（在屏幕右侧固定位置生成）
-                is_monster_exist=True
-                exist_monsters=level1_1_monsters
-                selected_level=0
+                if selected_level==1 and current_level_start:
+                    is_monster_exist=True
+                    exist_monsters = level1_1_monsters.copy()
+                    current_level_start=False
+                elif selected_level==1.1 and not bgp_move and current_level_start:
+                    is_monster_exist = True
+                    exist_monsters = level1_2_monsters.copy()
+                    current_level_start=False
+                elif 1.19<selected_level<1.21 and not bgp_move and current_level_start:
+                    is_monster_exist = True
+                    exist_monsters = level1_3_monsters.copy()
+                    current_level_start=False
+
+                if len(exist_monsters)==0 and selected_level<=1.21 and not bgp_move and not current_level_start:
+                    selected_level+=0.1
+                    if selected_level<1.3:
+                        bgp_move=True
+                    current_level_start=True
+                if 1.29<selected_level<1.31:
+                    selected_level=0
+                    is_in_city=True
+                    background_image = pygame.image.load("city.png")
+                    background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
             elif selected_level==2:
                 1
 
@@ -891,13 +930,23 @@ while running:
                 m.pos = (m.pos[0] + m.is_moving*m.is_facing_right * m.name.speed, m.pos[1])
 
                 if abs(player_x - m.pos[0]) < 50 + 60 and pygame.time.get_ticks() - m.last_attack_time>1000:
+
+
                     m.is_attacking = True
                     if m.is_facing_right == 1:
                         # 攻击动作
-                        m.pos = (m.pos[0] + 10, m.pos[1])
+                        if m.name==monster1:
+                            m.pos = (m.pos[0] + 10, m.pos[1])
+                        elif m.name == monster2:
+                            if len(bullets) < 100:
+                                bullets.append((m.pos[0],m.pos[1]))
                     else:
                         # 攻击动作
-                        m.pos = (m.pos[0] - 10, m.pos[1])
+                        if m.name == monster1:
+                            m.pos = (m.pos[0] - 10, m.pos[1])
+                        elif m.name==monster2:
+                            if len(bullets)<100:
+                                bullets.append((m.pos[0],m.pos[1]))
                     monster_attack_timer += dt
                     # 攻击动画持续0.2s
                     if monster_attack_timer >= monster_attack_duration:
@@ -912,15 +961,27 @@ while running:
                         m.health-=player_damage
                         if m.health<=0:
                             exist_monsters.remove(m)
+
                 if not player_is_attacking and m.is_attacking and pygame.time.get_ticks()-player_last_get_attack_time>700:
                     if player_x  < m.pos[0] < player_x + 60 and player_y <= m.pos[1] <= player_y + 60:
                         player_health-=m.damage
                         jump_velocity = 5
                         current_time = pygame.time.get_ticks()
                         player_last_get_attack_time = current_time
+            bullets_to_remove=[]
+            for i, p in enumerate(bullets.copy()):
+                if p[1] > player_ground+50:
+                    bullets_to_remove.append(i)  # 如果子弹超出屏幕，从列表中移除
+                if player_x-20<p[0]<player_x+50 and player_y<p[1]<player_y+50:
+                    player_health-=1
+                    bullets_to_remove.append(i)
 
+            for i in reversed(bullets_to_remove):
+                bullets.pop(i)
 
-
+            for i, p in enumerate(bullets.copy()):
+                bullets[i] = (p[0], p[1] + 5)
+                SCREEN.blit(bullet_image, bullets[i])
 
     pygame.display.update()
 # 游戏结束
