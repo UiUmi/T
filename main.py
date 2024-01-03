@@ -940,6 +940,7 @@ while running:
                     selected_level=0
                     player_health += 5
                     is_in_city=True
+                    level2_lock=False
                     background_image = pygame.image.load("city.png")
                     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
             elif selected_level==2:
