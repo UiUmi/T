@@ -283,7 +283,7 @@ class LevelButton:
 level_buttons = []
 
 # 示例：创建两个关卡按钮，分别关联关卡 1 和关卡 2
-button_rect1 = pygame.Rect(350, 280, 100, 100)  # 根据实际需求设置按钮位置和大小
+button_rect1 = pygame.Rect(550, 280, 100, 100)  # 根据实际需求设置按钮位置和大小
 button_rect2 = pygame.Rect(550, 280, 100, 100)
 level_buttons.append(LevelButton(button_rect1, level=1))
 level_buttons.append(LevelButton(button_rect2, level=2))
