@@ -43,14 +43,6 @@ current_frame = 0
 player_image = run_frames[current_frame]
 player_image = pygame.transform.scale(player_image, (60, 60))
 
-monster1_run_frames = [
-    pygame.image.load("monster1_run1.png"),
-    pygame.image.load("monster1_run2.png"),
-    pygame.image.load("monster1_run3.png")
-]
-monster1_current_frame = 0
-monster1_image = run_frames[current_frame]
-monster1_image = pygame.transform.scale(monster1_image, (60, 60))
 
 is_in_city=True
 
@@ -397,17 +389,34 @@ rule_button_pos= (WIDTH - 105, story_box_button_pos[1] + store_icon.get_height()
 is_speed_boost_active = False
 speed_boost_end_time = 0
 
+class Monster:
+    def __init__(self,name,speed,jump_velocity,image_path):
+        self.name=name
+
+        self.speed = speed
+        self.jump_velocity=jump_velocity
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (60, 60))
+        self.run_frames = [pygame.image.load(f"{name}_run{i + 1}.png") for i in range(3)]
+
+monster1=Monster(name="monster1",speed=3,jump_velocity=0,image_path="monster1.png")
+
+
+class Exist_Monster:
+    def __init__(self,name,pos,current_frame):
+        self.current_frame = current_frame
+        self.name=name
+        self.pos = pos
+
+exist_monsters=[]
+
 level1 = pygame.image.load("level1.png")
 level1 = pygame.transform.scale(level1, (100, 100))
 level1_pos = (350,280)
-
-
-monsters = [pygame.image.load("monster1.png") for _ in range(4)]
-monster_positions = [(700 + i * 50, HEIGHT - 240) for i in range(4)]
-monsters_rects = [monster.get_rect(topleft=pos) for monster, pos in zip(monsters, monster_positions)]
-monster_speed = 3  # 设置怪物的移动速度
-monster_jump_velocity=0
-monster_run_frames = [pygame.image.load(f"monster1_run{i+1}.png") for i in range(3)]
+exist_monster0=Exist_Monster(name=monster1,pos=(700, HEIGHT - 240),current_frame=0)
+exist_monster1=Exist_Monster(name=monster1,pos=(750, HEIGHT - 240),current_frame=0)
+exist_monster2=Exist_Monster(name=monster1,pos=(800, HEIGHT - 240),current_frame=0)
+level1_1_monsters=[exist_monster0,exist_monster1,exist_monster2]
 
 
 level2 = pygame.image.load("level2.png")
@@ -581,12 +590,17 @@ while running:
                 player_image = run_frames[current_frame]
                 player_image = pygame.transform.scale(player_image, (60, 60))
 
+            if is_monster_exist:
+                for m in exist_monsters:
+                    m.current_frame = (m.current_frame + 1) % len(m.name.run_frames)
+                    m.name.image = m.name.run_frames[m.current_frame]
+                    m.name.image = pygame.transform.scale(m.name.image, (60, 60))
             # 跳跃
             if not is_jumping:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_w] and player_y == player_ground:
                     is_jumping = True
-                    # Check if the jump potion is active
+
                     if is_jump_potion_active:
                         jump_velocity = jump_speed  # Use the modified jump speed
                     else:
@@ -604,18 +618,17 @@ while running:
                 player_y -= jump_velocity
                 jump_velocity -= gravity
             if is_monster_exist :
-                for i, monster_rect in enumerate(monsters_rects):
-                    if monsters_rects[i].y < player_ground:
-                        monsters_rects[i].y -= monster_jump_velocity
-                        monster_jump_velocity -= gravity
+                for m in exist_monsters:
+                    if m.pos[1] < player_ground:
+                        m.pos=(m.pos[0] ,m.pos[1]- m.name.jump_velocity)
+                        m.name.jump_velocity -= gravity
 
             # 限制主角在窗口范围内
             player_x = max(0, min(player_x, WIDTH - 30))
             player_y = max(0, min(player_y, player_ground))
             if is_monster_exist:
-                for i, monster_rect in enumerate(monsters_rects):
-                    monsters_rects[i].x = max(0, min(monsters_rects[i].x, WIDTH - 30))
-                    monsters_rects[i].y = max(0, min(monsters_rects[i].y, player_ground))
+                for m in exist_monsters:
+                    m.pos = (max(0, min(m.pos[0], WIDTH - 30)),max(0, min(m.pos[1], player_ground)))
             # 渲染背景
             SCREEN.blit(background_image, (0, 0))
 
@@ -635,7 +648,14 @@ while running:
             # 绘制背景
                 SCREEN.blit(background_image, (bg_x1, 0))
                 SCREEN.blit(background_image, (bg_x2, 0))
-            # 根据朝向渲染角色
+            # 根据朝向渲染
+            if is_monster_exist:
+                for m in exist_monsters:
+                    if player_x <m.pos[0]:
+                        flipped_m = pygame.transform.flip(m.name.image, True, False)
+                        SCREEN.blit(flipped_m, m.pos)
+                    else:
+                        SCREEN.blit(m.name.image, m.pos)
             if is_facing_right:
                 SCREEN.blit(player_image, (player_x, player_y))
             else:
@@ -829,26 +849,18 @@ while running:
             if selected_level == 1:
                 # 生成怪物（在屏幕右侧固定位置生成）
                 is_monster_exist=True
-                for i, monster_rect in enumerate(monsters_rects):
-
-                    if player_x < monster_rect.x:  # 如果玩家在怪物的左边
-                        monsters_rects[i].x -= monster_speed
-
-                    elif player_x > monster_rect.x:  # 如果玩家在怪物的右边
-                        monsters_rects[i].x += monster_speed
-
-
-
+                exist_monsters=level1_1_monsters
                 i=0
-                for monster_rect in monsters_rects:
-                    SCREEN.blit(monsters[i], monster_rect)  # 使用正确的怪物图像
-                    i+=1
 
+                for m in exist_monsters:
+                    if player_x < m.pos[0]:  # 如果玩家在怪物的左边
+                        m.pos = (m.pos[0] - m.name.speed, m.pos[1])
+                    elif player_x > m.pos[0]:  # 如果玩家在怪物的右边
+                        m.pos = (m.pos[0] + m.name.speed, m.pos[1])
+                    i+=1
 
             elif selected_level==2:
                 1
-
-
     pygame.display.update()
 
 
