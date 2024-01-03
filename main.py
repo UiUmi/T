@@ -12,7 +12,7 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("The Code Odyssey")
 
 # 设置游戏窗口名称
-icon = pygame.image.load("icon\head.png")  # 设置游戏窗口图标
+icon = pygame.image.load("head.png")  # 设置游戏窗口图标
 pygame.display.set_icon(icon)
 pygame.mixer.init()  # 加载和播放声音
 
@@ -292,9 +292,7 @@ level_buttons.append(LevelButton(button_rect2, level=2))
 
 # 在其他地方更新显示玩家的金币数量和背包
 def update_display():
-    # 更新金币数量的显示
-    # SCREEN.blit(coins_icon, (coin_x + i * coin_spacing, coin_y))
-    # pygame.display.update()
+
 
     # 更新背包的显示
     for i, item in enumerate(player_inventory):
@@ -429,7 +427,7 @@ exist_monsters=[]
 
 level1 = pygame.image.load("level1.png")
 level1 = pygame.transform.scale(level1, (100, 100))
-level1_pos = (350,280)
+level1_pos = (450,280)
 exist_monster1_0=Exist_Monster(name=monster1,pos=(700, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
 exist_monster1_1=Exist_Monster(name=monster1,pos=(750, HEIGHT - 240),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
 exist_monster1_2=Exist_Monster(name=monster1,pos=(800, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
@@ -454,7 +452,7 @@ level1_3_monsters=[exist_monster3_0,exist_monster3_1,exist_monster3_2,exist_mons
 
 level2 = pygame.image.load("level2.png")
 level2 = pygame.transform.scale(level2, (100, 100))
-level2_pos = (550,280)
+level2_pos = (546,280)
 
 
 exist_Boss=Exist_Monster(name=Boss,pos=(900,HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
