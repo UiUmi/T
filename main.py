@@ -69,10 +69,12 @@ gravity = 0.3
 # attack变量
 player_is_attacking = False
 player_attack_duration = 0.3
+monster_attack_duration = 0.1
 player_attack_timer = 0.0
+monster_attack_timer = 0.0
 player_attack_animation = pygame.image.load("player_attack_animation.png")  # 替换为你的攻击动画图片
 player_attack_animation = pygame.transform.scale(player_attack_animation, (60, 60))
-
+player_last_get_attack_time=pygame.time.get_ticks()
 #人物撞击伤害
 player_damage=1
 
@@ -410,10 +412,12 @@ class Exist_Monster:
         self.is_moving=is_moving
         self.health = name.health
         self.damage = name.damage
+        self.is_attacking=False
         self.jump_velocity = 0
         self.name=name
         self.move_counter=move_counter
         self.last_flip_time = pygame.time.get_ticks()  # 记录上次反转的时间
+        self.last_attack_time = pygame.time.get_ticks()  # 记录上次反attack的时间
         self.pos = pos
         self.dect=dect
 exist_monsters=[]
@@ -838,7 +842,6 @@ while running:
                                         # Example: player.activate_jump_visual_feedback()
                                     elif product.name == "ak_potion":
                                         player_damage+=1
-
                     # 在主循环中检查是否仍然处于加速状态
             if is_speed_boost_active:
                 if speed_boost_duration > 0:
@@ -849,9 +852,7 @@ while running:
                     is_speed_boost_active = False
                     player_speed -= 5
                     speed_boost_end_time = pygame.time.get_ticks()
-
                     # 使用正常速度
-
             if is_jump_potion_active:
                 jump_potion_duration -= dt  # dt is the time since the last frame, adjust as needed
                 if jump_potion_duration <= 0:
@@ -888,16 +889,37 @@ while running:
                         m.is_facing_right = 1
 
                 m.pos = (m.pos[0] + m.is_moving*m.is_facing_right * m.name.speed, m.pos[1])
+
+                if abs(player_x - m.pos[0]) < 50 + 60 and pygame.time.get_ticks() - m.last_attack_time>1000:
+                    m.is_attacking = True
+                    if m.is_facing_right == 1:
+                        # 攻击动作
+                        m.pos = (m.pos[0] + 10, m.pos[1])
+                    else:
+                        # 攻击动作
+                        m.pos = (m.pos[0] - 10, m.pos[1])
+                    monster_attack_timer += dt
+                    # 攻击动画持续0.2s
+                    if monster_attack_timer >= monster_attack_duration:
+                        m._is_attacking = False
+                        current_time = pygame.time.get_ticks()
+                        m.last_attack_time=current_time
+                        monster_attack_timer = 0.0
+
                 if player_is_attacking:
                     if player_x+60<m.pos[0]<player_x+120 and player_y-10<=m.pos[1]<=player_y+70:
                         m.jump_velocity=3
                         m.health-=player_damage
                         if m.health<=0:
                             exist_monsters.remove(m)
-                if not player_is_attacking:
+                if not player_is_attacking and m.is_attacking and pygame.time.get_ticks()-player_last_get_attack_time>700:
                     if player_x  < m.pos[0] < player_x + 60 and player_y <= m.pos[1] <= player_y + 60:
                         player_health-=m.damage
-                        jump_velocity = 3
+                        jump_velocity = 5
+                        current_time = pygame.time.get_ticks()
+                        player_last_get_attack_time = current_time
+
+
 
 
     pygame.display.update()
