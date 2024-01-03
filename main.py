@@ -74,7 +74,7 @@ player_attack_animation = pygame.image.load("player_attack_animation.png")  # �
 player_attack_animation = pygame.transform.scale(player_attack_animation, (60, 60))
 
 #人物撞击伤害
-player_damage=3
+player_damage=1
 
 # 定义主角的位置和朝向
 player_x = 50
@@ -391,16 +391,16 @@ is_speed_boost_active = False
 speed_boost_end_time = 0
 
 class Monster:
-    def __init__(self,name,health,speed,jump_velocity,image_path):
+    def __init__(self,name,health,speed,image_path,damage):
         self.name=name
+        self.damage = damage
         self.health=health
         self.speed = speed
-        self.jump_velocity=jump_velocity
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (60, 60))
         self.run_frames = [pygame.image.load(f"{name}_run{i + 1}.png") for i in range(3)]
 
-monster1=Monster(name="monster1",health=10,speed=2,jump_velocity=0,image_path="monster1.png")
+monster1=Monster(name="monster1",health=10,speed=2,image_path="monster1.png",damage=1)
 
 
 class Exist_Monster:
@@ -408,6 +408,9 @@ class Exist_Monster:
         self.current_frame = current_frame
         self.is_facing_right=is_facing_right
         self.is_moving=is_moving
+        self.health = name.health
+        self.damage = name.damage
+        self.jump_velocity = 0
         self.name=name
         self.move_counter=move_counter
         self.last_flip_time = pygame.time.get_ticks()  # 记录上次反转的时间
@@ -621,14 +624,14 @@ while running:
                     jump_velocity = 0
 
             # 应用下降重力效果
-            if player_y < player_ground and not is_jumping:
+            if (player_y < player_ground and not is_jumping)or jump_velocity!=0:
                 player_y -= jump_velocity
                 jump_velocity -= gravity
             if is_monster_exist :
                 for m in exist_monsters:
-                    if m.pos[1] < player_ground:
-                        m.pos=(m.pos[0] ,m.pos[1]- m.name.jump_velocity)
-                        m.name.jump_velocity -= gravity
+                    if m.pos[1] < player_ground or m.jump_velocity!=0:
+                        m.pos=(m.pos[0] ,m.pos[1]- m.jump_velocity)
+                        m.jump_velocity -= gravity
 
             # 限制主角在窗口范围内
             player_x = max(0, min(player_x, WIDTH - 30))
@@ -708,6 +711,7 @@ while running:
                         is_in_city=False
                         in_map = False
             if player_is_attacking:
+
                 if is_facing_right:
                     # 攻击动作
                     player_x += 4  # 向右快速移动
@@ -857,7 +861,7 @@ while running:
                 # 生成怪物（在屏幕右侧固定位置生成）
                 is_monster_exist=True
                 exist_monsters=level1_1_monsters
-
+                selected_level=0
             elif selected_level==2:
                 1
 
@@ -884,10 +888,19 @@ while running:
                         m.is_facing_right = 1
 
                 m.pos = (m.pos[0] + m.is_moving*m.is_facing_right * m.name.speed, m.pos[1])
+                if player_is_attacking:
+                    if player_x+60<m.pos[0]<player_x+120 and player_y-10<=m.pos[1]<=player_y+70:
+                        m.jump_velocity=3
+                        m.health-=player_damage
+                        if m.health<=0:
+                            exist_monsters.remove(m)
+                if not player_is_attacking:
+                    if player_x  < m.pos[0] < player_x + 60 and player_y <= m.pos[1] <= player_y + 60:
+                        player_health-=m.damage
+                        jump_velocity = 3
+
 
     pygame.display.update()
-
-
 # 游戏结束
 pygame.quit()
 sys.exit()
