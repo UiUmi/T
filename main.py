@@ -1,4 +1,5 @@
 import pygame
+import random
 import sys
 
 # 初始化 Pygame
@@ -73,7 +74,7 @@ player_attack_animation = pygame.image.load("player_attack_animation.png")  # �
 player_attack_animation = pygame.transform.scale(player_attack_animation, (60, 60))
 
 #人物撞击伤害
-player_damage=1
+player_damage=3
 
 # 定义主角的位置和朝向
 player_x = 50
@@ -390,32 +391,36 @@ is_speed_boost_active = False
 speed_boost_end_time = 0
 
 class Monster:
-    def __init__(self,name,speed,jump_velocity,image_path):
+    def __init__(self,name,health,speed,jump_velocity,image_path):
         self.name=name
-
+        self.health=health
         self.speed = speed
         self.jump_velocity=jump_velocity
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (60, 60))
         self.run_frames = [pygame.image.load(f"{name}_run{i + 1}.png") for i in range(3)]
 
-monster1=Monster(name="monster1",speed=3,jump_velocity=0,image_path="monster1.png")
+monster1=Monster(name="monster1",health=10,speed=2,jump_velocity=0,image_path="monster1.png")
 
 
 class Exist_Monster:
-    def __init__(self,name,pos,current_frame):
+    def __init__(self,name,pos,current_frame,is_facing_right,dect,move_counter,is_moving):
         self.current_frame = current_frame
+        self.is_facing_right=is_facing_right
+        self.is_moving=is_moving
         self.name=name
+        self.move_counter=move_counter
+        self.last_flip_time = pygame.time.get_ticks()  # 记录上次反转的时间
         self.pos = pos
-
+        self.dect=dect
 exist_monsters=[]
 
 level1 = pygame.image.load("level1.png")
 level1 = pygame.transform.scale(level1, (100, 100))
 level1_pos = (350,280)
-exist_monster0=Exist_Monster(name=monster1,pos=(700, HEIGHT - 240),current_frame=0)
-exist_monster1=Exist_Monster(name=monster1,pos=(750, HEIGHT - 240),current_frame=0)
-exist_monster2=Exist_Monster(name=monster1,pos=(800, HEIGHT - 240),current_frame=0)
+exist_monster0=Exist_Monster(name=monster1,pos=(700, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
+exist_monster1=Exist_Monster(name=monster1,pos=(750, HEIGHT - 240),current_frame=0,is_facing_right=1,dect=False,move_counter=0,is_moving=1)
+exist_monster2=Exist_Monster(name=monster1,pos=(800, HEIGHT - 240),current_frame=0,is_facing_right=-1,dect=False,move_counter=0,is_moving=1)
 level1_1_monsters=[exist_monster0,exist_monster1,exist_monster2]
 
 
@@ -591,10 +596,12 @@ while running:
                 player_image = pygame.transform.scale(player_image, (60, 60))
 
             if is_monster_exist:
+
                 for m in exist_monsters:
-                    m.current_frame = (m.current_frame + 1) % len(m.name.run_frames)
-                    m.name.image = m.name.run_frames[m.current_frame]
-                    m.name.image = pygame.transform.scale(m.name.image, (60, 60))
+                    if m.is_moving==1:
+                        m.current_frame = (m.current_frame + 1) % len(m.name.run_frames)
+                        m.name.image = m.name.run_frames[m.current_frame]
+                        m.name.image = pygame.transform.scale(m.name.image, (60, 60))
             # 跳跃
             if not is_jumping:
                 keys = pygame.key.get_pressed()
@@ -651,7 +658,7 @@ while running:
             # 根据朝向渲染
             if is_monster_exist:
                 for m in exist_monsters:
-                    if player_x <m.pos[0]:
+                    if m.is_facing_right==-1:
                         flipped_m = pygame.transform.flip(m.name.image, True, False)
                         SCREEN.blit(flipped_m, m.pos)
                     else:
@@ -850,17 +857,34 @@ while running:
                 # 生成怪物（在屏幕右侧固定位置生成）
                 is_monster_exist=True
                 exist_monsters=level1_1_monsters
-                i=0
-
-                for m in exist_monsters:
-                    if player_x < m.pos[0]:  # 如果玩家在怪物的左边
-                        m.pos = (m.pos[0] - m.name.speed, m.pos[1])
-                    elif player_x > m.pos[0]:  # 如果玩家在怪物的右边
-                        m.pos = (m.pos[0] + m.name.speed, m.pos[1])
-                    i+=1
 
             elif selected_level==2:
                 1
+
+            for m in exist_monsters:
+                if abs(player_x - m.pos[0])<200 and not m.dect:
+                    m.dect=True
+                if not m.dect:
+                    m.move_counter+=m.name.speed
+                    if m.move_counter > 300:
+                        current_time = pygame.time.get_ticks()
+                        m.move_counter = 0  # 重置计数器
+                        m.is_moving = 0
+                        m.last_flip_time=current_time
+
+                if m.is_moving==0:
+                    stay_time = pygame.time.get_ticks() - m.last_flip_time
+                    if stay_time > 1000:
+                        m.is_moving = 1
+                        m.is_facing_right *= random.choice([-1, +1])  # 反转fangxiang
+                if m.dect:
+                    if player_x < m.pos[0]:  # 如果玩家在怪物的左边
+                        m.is_facing_right = -1
+                    elif player_x > m.pos[0]:  # 如果玩家在怪物的右边
+                        m.is_facing_right = 1
+
+                m.pos = (m.pos[0] + m.is_moving*m.is_facing_right * m.name.speed, m.pos[1])
+
     pygame.display.update()
 
 
