@@ -1024,7 +1024,7 @@ while running:
                                 exist_monsters.remove(m)
                                 coins+=20
                     else:
-                        if player_x + 60 < m.pos[0] < player_x + 120 and player_y - 10 <= m.pos[1] <= player_y + 70:
+                        if player_x + 30 < m.pos[0] < player_x + 120 and player_y - 10 <= m.pos[1] <= player_y + 70:
                             m.jump_velocity = 3
                             m.health -= player_damage
                             if m.health <= 0:
