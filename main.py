@@ -893,9 +893,11 @@ while running:
                                         jump_potion_duration = 7.0  # 7 seconds, for example
 
                                         # Add visual feedback, such as a glowing effect or particle system
-                                        # Example: player.activate_jump_visual_feedback()
+
                                     elif product.name == "ak_potion":
                                         player_damage+=1
+                                        # Remove the ak_potion from the player's inventory
+                                        player_inventory.remove_item("ak_potion")
                     # 在主循环中检查是否仍然处于加速状态
             if is_speed_boost_active:
                 if speed_boost_duration > 0:
