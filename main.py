@@ -103,7 +103,7 @@ is_monster_exist=False
 is_in_main=True
 
 # 玩家血量
-player_health = 5
+player_health = 20
 
 # 主角和怪物的地面高度
 player_ground = HEIGHT - 180
@@ -299,16 +299,17 @@ def update_display():
     # 更新背包的显示
     for i, item in enumerate(player_inventory):
         print(f"Item {i + 1}: {item.name}")
-
+player_attack_cooldown = 500
+player_last_attack_time=pygame.time.get_ticks()
 class Product:
     def __init__(self, name, price, image_path):
         self.name = name
         self.price = price
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (70, 70))
-product1 = Product("health_potion", 10, "health_potion.png")
-product2 = Product("speed_potion", 5, "speed_potion.png")
-product3 = Product("jump_potion", 5, "jump_potion.png")
+product1 = Product("health_potion", 15, "health_potion.png")
+product2 = Product("speed_potion", 10, "speed_potion.png")
+product3 = Product("jump_potion", 10, "jump_potion.png")
 product4= Product("ak_potion", 15, "ak_potion.png")
 product5= Product("player1", 30, "player1.png")
 product6= Product("player2", 15, "player2.png")
@@ -598,7 +599,10 @@ while running:
                 # 角色移动和攻击
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_j]:
-                    player_is_attacking = True
+                    current_time = pygame.time.get_ticks()
+                    if current_time-player_last_attack_time>player_attack_cooldown:
+                        player_is_attacking = True
+                        player_last_attack_time=pygame.time.get_ticks()
                 if keys[pygame.K_a]:
                     player_x -= player_speed
                     is_running = True
@@ -720,8 +724,11 @@ while running:
                 flipped_player_image = pygame.transform.flip(player_image, True, False)
                 SCREEN.blit(flipped_player_image, (player_x, player_y))
             # 渲染血量指示
-            for i in range(player_health):
-                SCREEN.blit(heart_image, (heart_x + i * heart_spacing, heart_y))
+
+            num_of_heart = f"x {player_health}"
+            heart_surface = font.render(num_of_heart, True, (255, 255, 255))
+            SCREEN.blit(heart_image, (coin_x-5, 5))
+            SCREEN.blit(heart_surface, (50,8))
             # 渲染金币指示器
             num_of_coins = f"x {coins}"
             coins_surface = font.render(num_of_coins, True, (255, 255, 255))
@@ -857,7 +864,7 @@ while running:
                                         # 在这里可以执行购买商品的逻辑
                                     if product.name == "health_potion":
                                         # 增加爱心的数量
-                                        player_health += 1
+                                        player_health += 3
                                         # 从背包中移除药水
                                         player_inventory.remove_item("health_potion")
                                     elif product.name == "speed_potion":
@@ -927,6 +934,7 @@ while running:
                     current_level_start=True
                 if 1.29<selected_level<1.31:
                     selected_level=0
+                    player_health += 5
                     is_in_city=True
                     background_image = pygame.image.load("city.png")
                     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
@@ -934,14 +942,22 @@ while running:
                 if current_level_start:
                     is_monster_exist = True
                     exist_monsters = level2_monsters.copy()
+                    last_spawn_time = pygame.time.get_ticks()
                     current_level_start=False
                     last_spawn_time=pygame.time.get_ticks()
-                if  ((pygame.time.get_ticks()-last_spawn_time)>2 and Boss in exist_monsters):
+
+                current_time=pygame.time.get_ticks()
+                is_Boss_exist = False
+                for m in exist_monsters:
+                    if m.name==Boss:
+                        is_Boss_exist=True
+                if  (current_time-last_spawn_time)>10000 and is_Boss_exist:
                     exist_monsters += level2_monsters.copy()
                     last_spawn_time = pygame.time.get_ticks()
                 if len(exist_monsters)==0 and not current_level_start:
                     selected_level=0
                     is_in_city = True
+                    player_health += 5
                     background_image = pygame.image.load("city.png")
                     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
             for m in exist_monsters:
@@ -1001,13 +1017,14 @@ while running:
                             m.health -= player_damage
                             if m.health <= 0:
                                 exist_monsters.remove(m)
+                                coins+=20
                     else:
                         if player_x + 60 < m.pos[0] < player_x + 120 and player_y - 10 <= m.pos[1] <= player_y + 70:
                             m.jump_velocity = 3
                             m.health -= player_damage
                             if m.health <= 0:
                                 exist_monsters.remove(m)
-
+                                coins += 20
 
                 if not player_is_attacking and m.is_attacking and pygame.time.get_ticks()-player_last_get_attack_time>700:
                     if player_x  < m.pos[0] < player_x + 60 and player_y <= m.pos[1] <= player_y + 60:
@@ -1029,6 +1046,16 @@ while running:
             for i, p in enumerate(bullets.copy()):
                 bullets[i] = (p[0], p[1] + 5)
                 SCREEN.blit(bullet_image, bullets[i])
+            if player_health<=0:
+                selected_level = 0
+                is_in_city = True
+                exist_monsters=[]
+                player_health+=5
+                current_level_start=True
+                if player_health<5:
+                    player_health=5
+                background_image = pygame.image.load("city.png")
+                background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
     pygame.display.update()
 # 游戏结束
