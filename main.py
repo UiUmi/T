@@ -34,6 +34,8 @@ bgp_move=False
 bg_x1 = 0
 bg_x2 = bg_width
 
+player_last_use_potion=pygame.time.get_ticks()
+
 # 加载主角奔跑动画帧
 run_frames = [
     pygame.image.load("player_run1.png"),
@@ -611,22 +613,7 @@ while running:
                     is_facing_right = True  # 右移时朝向右
                 else:
                     is_running = False
-            if player_is_attacking:
-                if is_facing_right:
-                    # 攻击动作
-                    player_x += 10  # 向右快速移动
-                    # 渲染攻击动画
-                    SCREEN.blit(player_attack_animation, (player_x + 60, player_y))
-                else:
-                    # 攻击动作
-                    player_x -= 10  # 向右快速移动
-                    flipped_player_attack_animation = pygame.transform.flip(player_attack_animation, True, False)
-                    SCREEN.blit(flipped_player_attack_animation, (player_x - 60, player_y))
-                player_attack_timer += dt
-                # 攻击动画持续0.2s
-                if player_attack_timer >= player_attack_duration:
-                    player_is_attacking = False
-                    player_attack_timer = 0.0
+
             # 切换奔跑动画帧
             if is_running:
                 current_frame = (current_frame + 1) % len(run_frames)
@@ -771,13 +758,13 @@ while running:
 
                 if is_facing_right:
                     # 攻击动作
-                    player_x += 4  # 向右快速移动
+                    player_x += 12  # 向右快速移动
                     # 渲染攻击动画
                     SCREEN.blit(player_attack_animation, (player_x + 60, player_y))
 
                 else:
                     # 攻击动作
-                    player_x -= 4  # 向右快速移动
+                    player_x -= 12  # 向右快速移动
                     flipped_player_attack_animation = pygame.transform.flip(player_attack_animation, True, False)
                     SCREEN.blit(flipped_player_attack_animation, (player_x - 60, player_y))
 
@@ -836,10 +823,9 @@ while running:
                         y = inventory_box_pos[1] + 150 + row * item_spacing
                         item_rect = pygame.Rect(x, y, 50, 50)
 
-                        if item_rect.collidepoint(mouse_pos):  # 检查鼠标是否点击了某个物品
+                        if item_rect.collidepoint(mouse_pos) and event.type == pygame.MOUSEBUTTONDOWN:  # 检查鼠标是否点击了某个物品
                             # 获取被点击的商品对象
                             clicked_item = player_inventory.items[i]
-
                             # 根据商品对象更新主角形象
                             for product in products:
                                 if product.name == clicked_item.name:
@@ -865,41 +851,58 @@ while running:
                                             print(f"Run frames not found for {product.name}")
                                         # 在这里可以执行购买商品的逻辑
                                     if product.name == "health_potion":
-                                        # 增加爱心的数量
-                                        player_health += 3
-                                        # 从背包中移除药水
-                                        player_inventory.remove_item("health_potion")
+                                        current_time = pygame.time.get_ticks()
+                                        if current_time - player_last_use_potion > 500:
+                                            # 增加爱心的数量
+                                            player_health += 3
+                                            # 从背包中移除药水
+                                            player_inventory.remove_item("health_potion")
+                                            player_last_use_potion = pygame.time.get_ticks()
+
                                     elif product.name == "speed_potion":
-                                        # 增加主角的移动速度
-                                        player_speed += 5
-                                        # 启动加速状态
-                                        is_speed_boost_active = True
-                                        speed_boost_duration = 800000  # 10秒，以毫秒为单位
-                                        speed_boost_timer = pygame.time.get_ticks()
-                                        player_inventory.remove_item("speed_potion")
+                                        current_time = pygame.time.get_ticks()
+                                        if current_time - player_last_use_potion > 500:
+                                            # 增加主角的移动速度
+                                            player_speed += 5
+                                            # 启动加速状态
+                                            is_speed_boost_active = True
+                                            speed_boost_duration = 800000  # 10秒，以毫秒为单位
+                                            speed_boost_timer = pygame.time.get_ticks()
+
+                                            player_inventory.remove_item("speed_potion")
+                                            player_last_use_potion = pygame.time.get_ticks()
+
+
                                     # 在物品使用逻辑中添加 jump_potion
                                     elif product.name == "jump_potion" and not is_jump_potion_active:
-                                        # Store the original jump speed for later restoration
-                                        original_jump_speed = jump_speed
+                                        current_time = pygame.time.get_ticks()
+                                        if current_time - player_last_use_potion > 500:
+                                            # Store the original jump speed for later restoration
+                                            original_jump_speed = jump_speed
 
-                                        # Triple the jump speed
-                                        jump_speed *= 2
+                                            # Triple the jump speed
+                                            jump_speed *= 2
 
-                                        # Remove the jump potion from the player's inventory
-                                        player_inventory.remove_item("jump_potion")
+                                            # Remove the jump potion from the player's inventory
+                                            player_inventory.remove_item("jump_potion")
 
-                                        # Set a flag to indicate that a jump potion is active
-                                        is_jump_potion_active = True
+                                            # Set a flag to indicate that a jump potion is active
+                                            is_jump_potion_active = True
 
-                                        # Set the duration for the jump potion effects (adjust as needed)
-                                        jump_potion_duration = 7.0  # 7 seconds, for example
+                                            # Set the duration for the jump potion effects (adjust as needed)
+                                            jump_potion_duration = 7.0  # 7 seconds, for example
+                                            player_last_use_potion = pygame.time.get_ticks()
 
-                                        # Add visual feedback, such as a glowing effect or particle system
+                                            # Add visual feedback, such as a glowing effect or particle system
 
                                     elif product.name == "ak_potion":
-                                        player_damage+=1
-                                        # Remove the ak_potion from the player's inventory
-                                        player_inventory.remove_item("ak_potion")
+                                        current_time = pygame.time.get_ticks()
+                                        if current_time - player_last_use_potion > 500:
+                                            player_damage+=1
+                                            # Remove the ak_potion from the player's inventory
+                                            player_inventory.remove_item("ak_potion")
+                                            player_last_use_potion = pygame.time.get_ticks()
+
                     # 在主循环中检查是否仍然处于加速状态
             if is_speed_boost_active:
                 if speed_boost_duration > 0:
