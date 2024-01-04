@@ -199,7 +199,7 @@ player_inventory = PlayerInventory()
 
 
 # 金币数量
-coins = 100
+coins = 20
 # 设置字体和变量
 font_size = 36
 font = pygame.font.Font(None, font_size)  # 使用默认字体
@@ -231,7 +231,7 @@ def load_player_data():
             inventory = [Product(name.strip(), 0) for name in lines[1:]]
     except FileNotFoundError:
         # 如果文件不存在，使用默认值
-        coins = 100
+        coins = 20
         player_inventory = []
 # 保存玩家数据
 def save_player_data():
@@ -299,7 +299,7 @@ def update_display():
     # 更新背包的显示
     for i, item in enumerate(player_inventory):
         print(f"Item {i + 1}: {item.name}")
-player_attack_cooldown = 500
+player_attack_cooldown = 1200
 player_last_attack_time=pygame.time.get_ticks()
 class Product:
     def __init__(self, name, price, image_path):
@@ -405,9 +405,9 @@ class Monster:
         self.image = pygame.transform.scale(self.image, size)
         self.run_frames = [pygame.image.load(f"{name}_run{i + 1}.png") for i in range(3)]
 
-monster1=Monster(name="monster1",health=10,speed=2,image_path="monster1.png",damage=1,size=(60,60))
-monster2=Monster(name="monster2",health=5,speed=3,image_path="monster2.png",damage=2,size=(50,50))
-Boss=Monster(name="Boss",health=100,speed=0,image_path="Boss.png",damage=3,size=(200, 400))
+monster1=Monster(name="monster1",health=20,speed=2,image_path="monster1.png",damage=1,size=(60,60))
+monster2=Monster(name="monster2",health=15,speed=3,image_path="monster2.png",damage=2,size=(50,50))
+Boss=Monster(name="Boss",health=600,speed=0,image_path="Boss.png",damage=3,size=(200, 400))
 
 last_spawn_time=pygame.time.get_ticks()
 class Exist_Monster:
@@ -898,7 +898,9 @@ while running:
                                     elif product.name == "ak_potion":
                                         current_time = pygame.time.get_ticks()
                                         if current_time - player_last_use_potion > 500:
-                                            player_damage+=1
+                                            player_damage+=0.1
+                                            if player_attack_cooldown>0:
+                                                player_attack_cooldown-=100
                                             # Remove the ak_potion from the player's inventory
                                             player_inventory.remove_item("ak_potion")
                                             player_last_use_potion = pygame.time.get_ticks()
