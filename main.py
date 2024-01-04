@@ -366,7 +366,7 @@ rule_box_open = False
 rule_box_pos = (WIDTH/2-550, -115)
 rule_box_pos = (rule_box_pos[0], rule_box_pos[1] - 10)
 rule_box_background = pygame.image.load("rule_box_background.png")
-rule_box_background = pygame.transform.scale(rule_box_background, (1100, 1000))
+rule_box_background = pygame.transform.scale(rule_box_background, (900, 900))
 
 #######各个图标的建立
 # 故事框按钮
